@@ -6,6 +6,7 @@ use App\Models\Receiving;
 use App\Models\Item;
 use App\Services\InventoryService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
@@ -157,6 +158,8 @@ class ReceivingController extends Controller
                 $validated['department'] ?? null
             );
 
+            Cache::flush();
+
             return redirect()->route('receiving.index')
                 ->with('message', 'Stock received successfully.');
         } catch (\Exception $e) {
@@ -189,6 +192,7 @@ class ReceivingController extends Controller
 
         cache()->forget("inventory_item_{$previousItemcode}");
         cache()->forget("inventory_item_{$receiving->itemcode}");
+        Cache::flush();
 
         return redirect()->route('receiving.index')
             ->with('message', 'Receiving record updated successfully.');
@@ -203,6 +207,7 @@ class ReceivingController extends Controller
         $receiving->delete();
 
         cache()->forget("inventory_item_{$itemcode}");
+        Cache::flush();
 
         return redirect()->route('receiving.index')
             ->with('message', 'Receiving record deleted successfully.');

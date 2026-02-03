@@ -112,7 +112,13 @@
             <form @submit.prevent="submitReceive">
                 <div class="space-y-6">
                     <div class="grid grid-cols-2 gap-4">
-                        <Input id="supplier" v-model="receiveForm.supplier" label="Supplier" :error="receiveForm.errors.supplier" />
+                        <Input
+                            id="supplier"
+                            v-model="receiveForm.supplier"
+                            label="Supplier"
+                            :disabled="receiveForm.items.length > 0"
+                            :error="receiveForm.errors.supplier"
+                        />
                         <Input id="referenceno" v-model="receiveForm.referenceno" label="Reference Number" disabled :error="receiveForm.errors.referenceno" />
                     </div>
 
@@ -156,7 +162,7 @@
                             <div class="col-span-3">
                                 <p class="text-xs text-gray-500">
                                     Line Total:
-                                    <span class="font-semibold text-[#2e7d32]">{{ formatNumber(currentTotal) }}</span>
+                                    <span class="font-semibold text-[#2e7d32]">{{ formatMoney(currentTotal) }}</span>
                                 </p>
                             </div>
                             <div class="col-span-9 flex justify-end">
@@ -187,13 +193,13 @@
                                 </thead>
                                 <tbody>
                                     <tr v-for="(item, index) in receiveForm.items" :key="index" class="border-t">
-                                        <td class="py-2 px-3">{{ itemLabel(item.itemcode) }}</td>
+                                        <td class="py-2 px-3">{{ index + 1 }}</td>
                                         <td class="py-2 px-3">{{ item.batchno }}</td>
                                         <td class="py-2 px-3">{{ item.expirydate }}</td>
                                         <td class="py-2 px-3">{{ item.qty }}</td>
                                         <td class="py-2 px-3">{{ item.uom }}</td>
-                                        <td class="py-2 px-3">{{ formatNumber(item.unitprice) }}</td>
-                                        <td class="py-2 px-3">{{ formatNumber(itemTotal(item)) }}</td>
+                                        <td class="py-2 px-3">{{ formatMoney(item.unitprice) }}</td>
+                                        <td class="py-2 px-3">{{ formatMoney(itemTotal(item)) }}</td>
                                         <td class="py-2 px-3">
                                             <button type="button" class="text-red-600 hover:text-red-800" @click="removeItem(index)">Remove</button>
                                         </td>
@@ -204,15 +210,27 @@
                     </div>
 
                     <div class="rounded-lg border border-[#cfe8d1] bg-[#FBFCFA] p-4">
-                        <p class="text-sm font-medium text-gray-700">Grand Total: <span class="text-lg font-bold text-[#2e7d32]">{{ formatNumber(grandTotal) }}</span></p>
+                        <p class="text-sm font-medium text-gray-700">Grand Total: <span class="text-lg font-bold text-[#2e7d32]">{{ formatMoney(grandTotal) }}</span></p>
                     </div>
                 </div>
 
                 <div class="-mx-6 -mb-6 mt-5 rounded-b-lg bg-[#2e7d32] px-6 py-4 flex items-center justify-end space-x-2 min-h-[56px]">
-                    <Button variant="danger" type="button" class="bg-white text-[#2e7d32] hover:bg-[#dff1e1] focus:ring-white h-9" @click="closeReceiveModal">Cancel</Button>
+                    <Button variant="danger" type="button" class="bg-white text-[#2e7d32] hover:bg-[#dff1e1] focus:ring-white h-9" @click="requestReceiveCancel">Cancel</Button>
                     <Button variant="secondary" type="submit" class="bg-white text-[#2e7d32] hover:bg-[#dff1e1] focus:ring-white h-9" :disabled="receiveForm.processing">Receive Stock</Button>
                 </div>
             </form>
+        </Modal>
+
+        <Modal :show="showReceiveCancelConfirm" :showFooter="false" @close="closeReceiveCancelConfirm">
+            <div class="-mx-6 -mt-6 mb-6 rounded-t-lg bg-[#2e7d32] px-6 py-4 text-white">
+                <h3 class="text-lg font-semibold">Discard Transaction?</h3>
+                <p class="text-sm text-white/80">You have entered data for this stock receipt.</p>
+            </div>
+            <p class="text-sm text-gray-700">Canceling will discard the current receiving transaction. Continue?</p>
+            <div class="-mx-6 -mb-6 mt-5 rounded-b-lg bg-[#2e7d32] px-6 py-4 flex items-center justify-end space-x-2 min-h-[56px]">
+                <Button variant="secondary" class="bg-white text-[#2e7d32] hover:bg-[#dff1e1] focus:ring-white h-9" @click="closeReceiveCancelConfirm">Keep Editing</Button>
+                <Button variant="secondary" class="bg-white text-[#2e7d32] hover:bg-[#dff1e1] focus:ring-white h-9" @click="confirmReceiveCancel">Discard</Button>
+            </div>
         </Modal>
 
         <Modal :show="showViewModal" :showFooter="false" maxWidth="sm:max-w-4xl" @close="closeViewModal">
@@ -240,11 +258,11 @@
                             <tbody class="divide-y divide-gray-200 bg-white">
                                 <tr v-for="item in viewRecord.items" :key="item.recid">
                                     <td class="px-3 py-2">{{ item.itemname }}</td>
-                                    <td class="px-3 py-2">{{ item.qty }}</td>
+                                    <td class="px-3 py-2">{{ formatNumber(item.qty) }}</td>
                                     <td class="px-3 py-2">{{ item.uom }}</td>
-                                    <td class="px-3 py-2">{{ formatNumber(item.unitprice) }}</td>
-                                    <td class="px-3 py-2">{{ formatNumber(item.totalamount) }}</td>
-                                    <td class="px-3 py-2">{{ item.expirydate || '-' }}</td>
+                                    <td class="px-3 py-2">{{ formatMoney(item.unitprice) }}</td>
+                                    <td class="px-3 py-2">{{ formatMoney(item.totalamount) }}</td>
+                                    <td class="px-3 py-2">{{ formatDate(item.expirydate) }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -267,6 +285,15 @@
                 <div><span class="font-semibold text-[#1b5e20]">Supplier:</span> {{ editBatchRecord?.supplier || '-' }}</div>
                 <div><span class="font-semibold text-[#1b5e20]">Date Received:</span> {{ formatDate(editBatchRecord?.datereceived) }}</div>
                 <div class="pt-2" v-if="editBatchRecord?.items?.length">
+                    <div class="flex items-center justify-between">
+                        <p class="text-sm font-semibold text-gray-700">Items</p>
+                        <button type="button" class="btn-primary" @click="openBatchAddModal">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            </svg>
+                            <span>Add Item</span>
+                        </button>
+                    </div>
                     <div class="mt-2 overflow-hidden rounded-lg border border-gray-200">
                         <table class="min-w-full text-sm">
                             <thead class="bg-gray-100 text-gray-600">
@@ -285,8 +312,8 @@
                                     <td class="px-3 py-2">{{ item.itemname }}</td>
                                     <td class="px-3 py-2">{{ item.qty }}</td>
                                     <td class="px-3 py-2">{{ item.uom }}</td>
-                                    <td class="px-3 py-2">{{ formatNumber(item.unitprice) }}</td>
-                                    <td class="px-3 py-2">{{ formatNumber(item.totalamount) }}</td>
+                                    <td class="px-3 py-2">{{ formatMoney(item.unitprice) }}</td>
+                                    <td class="px-3 py-2">{{ formatMoney(item.totalamount) }}</td>
                                     <td class="px-3 py-2">{{ item.expirydate || '-' }}</td>
                                     <td class="px-3 py-2">
                                         <button
@@ -398,7 +425,7 @@
                             <div class="col-span-3">
                                 <p class="text-xs text-gray-500">
                                     Line Total:
-                                    <span class="font-semibold text-[#2e7d32]">{{ formatNumber(editTotal) }}</span>
+                                    <span class="font-semibold text-[#2e7d32]">{{ formatMoney(editTotal) }}</span>
                                 </p>
                             </div>
                         </div>
@@ -406,10 +433,82 @@
                 </div>
 
                 <div class="-mx-6 -mb-6 mt-5 rounded-b-lg bg-blue-600 px-6 py-4 flex items-center justify-end space-x-2 min-h-[56px]">
-                    <Button variant="danger" type="button" class="bg-white text-blue-600 hover:bg-blue-50 focus:ring-white h-9" @click="closeItemEditModal">Cancel</Button>
+                    <Button variant="danger" type="button" class="bg-white text-blue-600 hover:bg-blue-50 focus:ring-white h-9" @click="requestItemEditClose">Cancel</Button>
                     <Button variant="secondary" type="button" class="bg-white text-blue-600 hover:bg-blue-50 focus:ring-white h-9" :disabled="editForm.processing" @click="openItemUpdateConfirm">Save Changes</Button>
                 </div>
             </form>
+        </Modal>
+
+        <Modal :show="showBatchAddModal" :showFooter="false" maxWidth="sm:max-w-4xl" @close="closeBatchAddModal">
+            <div class="-mx-6 -mt-6 mb-6 rounded-t-lg bg-blue-600 px-6 py-4 text-white">
+                <h3 class="text-lg font-semibold">Add Item</h3>
+                <p class="text-sm text-white/80">Add a new item to this batch.</p>
+            </div>
+            <div class="space-y-6">
+                <div class="rounded-xl border border-[#cfe8d1] bg-[#FBFCFA] p-4 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <p class="text-sm font-semibold text-gray-700">Add Item</p>
+                    </div>
+
+                    <div class="grid grid-cols-12 gap-4">
+                        <div class="col-span-3">
+                            <Input id="add_batchno" v-model="addItemForm.batchno" label="Batch Number" disabled :error="addItemErrors.batchno" />
+                        </div>
+                        <div class="col-span-6">
+                            <Select
+                                id="add_itemcode"
+                                v-model="addItemForm.itemcode"
+                                label="Medicine"
+                                :options="itemOptions"
+                                required
+                                :error="addItemErrors.itemcode"
+                            />
+                        </div>
+                        <div class="col-span-3">
+                            <Input id="add_expirydate" v-model="addItemForm.expirydate" label="Expiry Date" type="date" required :error="addItemErrors.expirydate" />
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-12 gap-4">
+                        <div class="col-span-4">
+                            <Input id="add_qty" v-model="addItemForm.qty" label="Quantity" type="number" step="0.01" required :error="addItemErrors.qty" />
+                        </div>
+                        <div class="col-span-4">
+                            <Input id="add_uom" v-model="addItemForm.uom" label="Unit of Measure" required :error="addItemErrors.uom" />
+                        </div>
+                        <div class="col-span-4">
+                            <Input id="add_unitprice" v-model="addItemForm.unitprice" label="Unit Price" type="number" step="0.01" required :error="addItemErrors.unitprice" />
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-12 items-center gap-4">
+                        <div class="col-span-3">
+                            <p class="text-xs text-gray-500">
+                                Line Total:
+                                <span class="font-semibold text-[#2e7d32]">{{ formatMoney(addItemTotal) }}</span>
+                            </p>
+                        </div>
+                        <div class="col-span-9 flex justify-end">
+                            <Button class="btn-primary" type="button" @click="addItemToBatch">Add Item</Button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="-mx-6 -mb-6 mt-5 rounded-b-lg bg-blue-600 px-6 py-4 flex items-center justify-end space-x-2 min-h-[56px]">
+                <Button variant="danger" class="bg-white text-blue-600 hover:bg-blue-50 focus:ring-white h-9" @click="closeBatchAddModal">Cancel</Button>
+            </div>
+        </Modal>
+
+        <Modal :show="showItemCancelConfirm" :showFooter="false" @close="closeItemCancelConfirm">
+            <div class="-mx-6 -mt-6 mb-6 rounded-t-lg bg-blue-600 px-6 py-4 text-white">
+                <h3 class="text-lg font-semibold">Discard Changes?</h3>
+                <p class="text-sm text-white/80">You have unsaved edits.</p>
+            </div>
+            <p class="text-sm text-gray-700">Canceling will discard changes made to this item. Continue?</p>
+            <div class="-mx-6 -mb-6 mt-5 rounded-b-lg bg-blue-600 px-6 py-4 flex items-center justify-end space-x-2 min-h-[56px]">
+                <Button variant="secondary" class="bg-white text-blue-600 hover:bg-blue-50 focus:ring-white h-9" @click="closeItemCancelConfirm">Keep Editing</Button>
+                <Button variant="secondary" class="bg-white text-blue-600 hover:bg-blue-50 focus:ring-white h-9" @click="confirmItemDiscard">Discard</Button>
+            </div>
         </Modal>
 
         <Modal :show="showItemUpdateConfirm" :showFooter="false" @close="closeItemUpdateConfirm">
@@ -444,6 +543,18 @@
             <p class="text-sm text-gray-700">Are you sure you want to delete batch "{{ deleteRecord?.batchno }}"?</p>
             <div class="-mx-6 -mb-6 mt-5 rounded-b-lg bg-red-600 px-6 py-4 flex items-center justify-end space-x-2 min-h-[56px]">
                 <Button variant="secondary" class="bg-white text-red-600 hover:bg-red-50 focus:ring-white h-9" @click="closeDeleteModal">Cancel</Button>
+                <Button variant="danger" class="bg-white text-red-600 hover:bg-red-50 focus:ring-white h-9" @click="openBatchDeleteConfirm">Delete</Button>
+            </div>
+        </Modal>
+
+        <Modal :show="showBatchDeleteConfirm" :showFooter="false" @close="closeBatchDeleteConfirm">
+            <div class="-mx-6 -mt-6 mb-6 rounded-t-lg bg-red-600 px-6 py-4 text-white">
+                <h3 class="text-lg font-semibold">Confirm Delete</h3>
+                <p class="text-sm text-white/80">You are about to delete this batch.</p>
+            </div>
+            <p class="text-sm text-gray-700">Proceed with deleting batch "{{ deleteRecord?.batchno }}"?</p>
+            <div class="-mx-6 -mb-6 mt-5 rounded-b-lg bg-red-600 px-6 py-4 flex items-center justify-end space-x-2 min-h-[56px]">
+                <Button variant="secondary" class="bg-white text-red-600 hover:bg-red-50 focus:ring-white h-9" @click="closeBatchDeleteConfirm">Cancel</Button>
                 <Button variant="danger" class="bg-white text-red-600 hover:bg-red-50 focus:ring-white h-9" @click="submitDelete">Delete</Button>
             </div>
         </Modal>
@@ -472,6 +583,7 @@ interface ReceivingRecord extends Receiving {
         unitprice: number;
         totalamount: number;
         expirydate: string | null;
+        isNew?: boolean;
     }>;
 }
 
@@ -514,6 +626,7 @@ const props = defineProps<Props>();
 const { receivings, summary } = props;
 
 const showReceiveModal = ref(false);
+const showReceiveCancelConfirm = ref(false);
 const showViewModal = ref(false);
 const showBatchEditModal = ref(false);
 const showItemEditModal = ref(false);
@@ -521,6 +634,9 @@ const showItemDeleteModal = ref(false);
 const showItemUpdateConfirm = ref(false);
 const showBatchUpdateConfirm = ref(false);
 const showBatchCancelConfirm = ref(false);
+const showBatchDeleteConfirm = ref(false);
+const showItemCancelConfirm = ref(false);
+const showBatchAddModal = ref(false);
 const showDeleteModal = ref(false);
 
 const viewRecord = ref<ReceivingRecord | null>(null);
@@ -528,6 +644,9 @@ const editBatchRecord = ref<ReceivingRecord | null>(null);
 const editItemRecord = ref<ReceivingItem | null>(null);
 const itemDeleteRecord = ref<ReceivingItem | null>(null);
 const pendingItemEdits = ref<Record<number, PendingItemEdit>>({});
+const itemEditSnapshot = ref<PendingItemEdit | null>(null);
+const pendingItemAdds = ref<Array<PendingItemEdit & { tempId: number }>>([]);
+const tempItemId = ref(-1);
 const deleteRecord = ref<ReceivingRecord | null>(null);
 
 const receiveForm = useForm({
@@ -572,6 +691,24 @@ const editForm = useForm({
     expirydate: '',
 });
 
+const addItemForm = ref({
+    itemcode: '' as number | '',
+    batchno: '',
+    expirydate: '',
+    qty: '',
+    uom: '',
+    unitprice: '',
+});
+
+const addItemErrors = ref({
+    itemcode: '',
+    batchno: '',
+    expirydate: '',
+    qty: '',
+    uom: '',
+    unitprice: '',
+});
+
 const itemOptions = computed(() => {
     return props.items.map(item => ({
         value: item.itemcode,
@@ -579,7 +716,7 @@ const itemOptions = computed(() => {
     }));
 });
 
-const pendingEditsCount = computed(() => Object.keys(pendingItemEdits.value).length);
+const pendingEditsCount = computed(() => Object.keys(pendingItemEdits.value).length + pendingItemAdds.value.length);
 
 const getNextCode = (prefix: string, values: Array<string | null | undefined>) => {
     const max = values.reduce((acc, value) => {
@@ -615,6 +752,17 @@ watch(
     }
 );
 
+watch(
+    () => addItemForm.value.itemcode,
+    (value) => {
+        if (!value) return;
+        const selected = props.items.find(item => item.itemcode === value);
+        if (selected && selected.default_uom && !addItemForm.value.uom) {
+            addItemForm.value.uom = selected.default_uom;
+        }
+    }
+);
+
 const itemLabel = (itemcode: number | '') => {
     if (!itemcode) return 'N/A';
     const match = props.items.find(item => item.itemcode === itemcode);
@@ -633,6 +781,12 @@ const editTotal = computed(() => {
     return qty * price;
 });
 
+const addItemTotal = computed(() => {
+    const qty = parseFloat(addItemForm.value.qty) || 0;
+    const price = parseFloat(addItemForm.value.unitprice) || 0;
+    return qty * price;
+});
+
 const grandTotal = computed(() => {
     return receiveForm.items.reduce((sum, item) => sum + itemTotal(item), 0);
 });
@@ -646,6 +800,12 @@ const itemTotal = (item: { qty: string; unitprice: string }) => {
 const formatNumber = (value: number | string) => {
     const num = typeof value === 'number' ? value : parseFloat(value);
     return Number.isFinite(num) ? num.toFixed(2) : '0.00';
+};
+
+const formatMoney = (value: number | string) => {
+    const num = typeof value === 'number' ? value : parseFloat(value);
+    if (!Number.isFinite(num)) return '0.00';
+    return num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 };
 
 const formatDate = (value?: string | null) => {
@@ -677,6 +837,12 @@ const resetItemErrors = () => {
 const addItem = () => {
     resetItemErrors();
     receiveForm.clearErrors('items');
+    receiveForm.clearErrors('supplier');
+
+    if (!receiveForm.supplier) {
+        receiveForm.setError('supplier', 'Required');
+        return;
+    }
 
     if (!currentItem.value.itemcode) itemErrors.value.itemcode = 'Required';
     if (!currentItem.value.batchno) itemErrors.value.batchno = 'Required';
@@ -710,6 +876,35 @@ const openReceiveModal = () => {
     if (!currentItem.value.batchno) {
         currentItem.value.batchno = generateNextBatch();
     }
+};
+
+const hasReceiveData = computed(() => {
+    return !!(
+        receiveForm.supplier ||
+        receiveForm.items.length ||
+        currentItem.value.itemcode ||
+        currentItem.value.expirydate ||
+        currentItem.value.qty ||
+        currentItem.value.uom ||
+        currentItem.value.unitprice
+    );
+});
+
+const requestReceiveCancel = () => {
+    if (hasReceiveData.value) {
+        showReceiveCancelConfirm.value = true;
+        return;
+    }
+    closeReceiveModal();
+};
+
+const closeReceiveCancelConfirm = () => {
+    showReceiveCancelConfirm.value = false;
+};
+
+const confirmReceiveCancel = () => {
+    showReceiveCancelConfirm.value = false;
+    closeReceiveModal();
 };
 
 const closeReceiveModal = () => {
@@ -767,6 +962,7 @@ const cancelBatchDiscard = () => {
 
 const confirmBatchDiscard = () => {
     pendingItemEdits.value = {};
+    pendingItemAdds.value = [];
     showBatchCancelConfirm.value = false;
     closeBatchEditModal();
 };
@@ -782,12 +978,55 @@ const openItemEditModal = (item: ReceivingItem) => {
     editForm.supplier = editBatchRecord.value?.supplier || '';
     editForm.referenceno = editBatchRecord.value?.referenceno || '';
     editForm.clearErrors();
+    itemEditSnapshot.value = {
+        recid: item.recid,
+        itemcode: item.itemcode,
+        qty: String(item.qty ?? ''),
+        uom: item.uom || '',
+        unitprice: String(item.unitprice ?? ''),
+        batchno: editBatchRecord.value?.batchno || '',
+        expirydate: item.expirydate || '',
+        supplier: editBatchRecord.value?.supplier || '',
+        referenceno: editBatchRecord.value?.referenceno || '',
+    };
     showItemEditModal.value = true;
+};
+
+const hasItemEditChanges = () => {
+    if (!itemEditSnapshot.value) return false;
+    return (
+        Number(editForm.itemcode) !== itemEditSnapshot.value.itemcode ||
+        editForm.qty !== itemEditSnapshot.value.qty ||
+        editForm.uom !== itemEditSnapshot.value.uom ||
+        editForm.unitprice !== itemEditSnapshot.value.unitprice ||
+        editForm.batchno !== itemEditSnapshot.value.batchno ||
+        editForm.expirydate !== itemEditSnapshot.value.expirydate ||
+        editForm.supplier !== itemEditSnapshot.value.supplier ||
+        editForm.referenceno !== itemEditSnapshot.value.referenceno
+    );
+};
+
+const requestItemEditClose = () => {
+    if (hasItemEditChanges()) {
+        showItemCancelConfirm.value = true;
+        return;
+    }
+    closeItemEditModal();
+};
+
+const closeItemCancelConfirm = () => {
+    showItemCancelConfirm.value = false;
+};
+
+const confirmItemDiscard = () => {
+    showItemCancelConfirm.value = false;
+    closeItemEditModal();
 };
 
 const closeItemEditModal = () => {
     showItemEditModal.value = false;
     editItemRecord.value = null;
+    itemEditSnapshot.value = null;
 };
 
 const openItemUpdateConfirm = () => {
@@ -811,6 +1050,92 @@ const closeBatchUpdateConfirm = () => {
     showBatchUpdateConfirm.value = false;
 };
 
+const openBatchAddModal = () => {
+    addItemForm.value = {
+        itemcode: '',
+        batchno: editBatchRecord.value?.batchno || '',
+        expirydate: '',
+        qty: '',
+        uom: '',
+        unitprice: '',
+    };
+    addItemErrors.value = {
+        itemcode: '',
+        batchno: '',
+        expirydate: '',
+        qty: '',
+        uom: '',
+        unitprice: '',
+    };
+    showBatchAddModal.value = true;
+};
+
+const closeBatchAddModal = () => {
+    showBatchAddModal.value = false;
+};
+
+const addItemToBatch = () => {
+    addItemErrors.value = {
+        itemcode: '',
+        batchno: '',
+        expirydate: '',
+        qty: '',
+        uom: '',
+        unitprice: '',
+    };
+
+    if (!addItemForm.value.itemcode) addItemErrors.value.itemcode = 'Required';
+    if (!addItemForm.value.batchno) addItemErrors.value.batchno = 'Required';
+    if (!addItemForm.value.expirydate) addItemErrors.value.expirydate = 'Required';
+    if (!addItemForm.value.qty) addItemErrors.value.qty = 'Required';
+    if (!addItemForm.value.uom) addItemErrors.value.uom = 'Required';
+    if (!addItemForm.value.unitprice) addItemErrors.value.unitprice = 'Required';
+
+    if (Object.values(addItemErrors.value).some(error => error)) return;
+
+    const qty = parseFloat(addItemForm.value.qty) || 0;
+    const price = parseFloat(addItemForm.value.unitprice) || 0;
+    const itemName = props.items.find(item => item.itemcode === Number(addItemForm.value.itemcode))?.itemname || 'N/A';
+    const tempId = tempItemId.value--;
+
+    const newItem: ReceivingItem = {
+        recid: tempId,
+        itemcode: Number(addItemForm.value.itemcode),
+        itemname: itemName,
+        qty,
+        uom: addItemForm.value.uom,
+        unitprice: Number(addItemForm.value.unitprice) || 0,
+        totalamount: qty * price,
+        expirydate: addItemForm.value.expirydate,
+        isNew: true,
+    };
+
+    if (editBatchRecord.value) {
+        editBatchRecord.value = {
+            ...editBatchRecord.value,
+            items: [...(editBatchRecord.value.items || []), newItem],
+        };
+    }
+
+    pendingItemAdds.value = [
+        ...pendingItemAdds.value,
+        {
+            recid: tempId,
+            tempId,
+            itemcode: Number(addItemForm.value.itemcode),
+            qty: addItemForm.value.qty,
+            uom: addItemForm.value.uom,
+            unitprice: addItemForm.value.unitprice,
+            batchno: addItemForm.value.batchno,
+            expirydate: addItemForm.value.expirydate,
+            supplier: editBatchRecord.value?.supplier || '',
+            referenceno: editBatchRecord.value?.referenceno || '',
+        },
+    ];
+
+    closeBatchAddModal();
+};
+
 const applyItemEditLocal = () => {
     if (!editItemRecord.value || !editBatchRecord.value) return;
 
@@ -826,14 +1151,21 @@ const applyItemEditLocal = () => {
         referenceno: editForm.referenceno,
     };
 
-    pendingItemEdits.value = {
-        ...pendingItemEdits.value,
-        [payload.recid]: payload,
-    };
-
     const itemName = props.items.find(item => item.itemcode === payload.itemcode)?.itemname || editItemRecord.value.itemname;
     const qty = parseFloat(payload.qty) || 0;
     const price = parseFloat(payload.unitprice) || 0;
+
+    if (editItemRecord.value.isNew) {
+        pendingItemAdds.value = pendingItemAdds.value.map(item =>
+            item.recid === payload.recid ? { ...item, ...payload } : item
+        );
+    } else {
+        pendingItemEdits.value = {
+            ...pendingItemEdits.value,
+            [payload.recid]: payload,
+        };
+    }
+
     const updatedItems = (editBatchRecord.value.items || []).map(item =>
         item.recid === payload.recid
             ? {
@@ -860,7 +1192,8 @@ const applyItemEditLocal = () => {
 const commitBatchUpdates = async () => {
     showBatchUpdateConfirm.value = false;
     const edits = Object.values(pendingItemEdits.value);
-    if (!edits.length) {
+    const adds = pendingItemAdds.value;
+    if (!edits.length && !adds.length) {
         closeBatchEditModal();
         return;
     }
@@ -891,7 +1224,34 @@ const commitBatchUpdates = async () => {
         await updateItem(edit);
     }
 
+    if (adds.length) {
+        await new Promise<void>((resolve) => {
+            router.post(
+                '/receiving',
+                {
+                    supplier: editBatchRecord.value?.supplier || null,
+                    referenceno: editBatchRecord.value?.referenceno || null,
+                    department: null,
+                    items: adds.map(item => ({
+                        itemcode: item.itemcode,
+                        qty: item.qty,
+                        uom: item.uom,
+                        unitprice: item.unitprice,
+                        batchno: item.batchno,
+                        expirydate: item.expirydate,
+                    })),
+                },
+                {
+                    preserveScroll: true,
+                    onSuccess: () => resolve(),
+                    onError: () => resolve(),
+                }
+            );
+        });
+    }
+
     pendingItemEdits.value = {};
+    pendingItemAdds.value = [];
     router.reload({
         only: ['receivings', 'summary'],
         onSuccess: () => {
@@ -912,6 +1272,17 @@ const closeItemDeleteModal = () => {
 
 const submitItemDelete = () => {
     if (!itemDeleteRecord.value) return;
+    if (itemDeleteRecord.value.isNew) {
+        if (editBatchRecord.value) {
+            editBatchRecord.value = {
+                ...editBatchRecord.value,
+                items: (editBatchRecord.value.items || []).filter(item => item.recid !== itemDeleteRecord.value?.recid),
+            };
+        }
+        pendingItemAdds.value = pendingItemAdds.value.filter(item => item.recid !== itemDeleteRecord.value?.recid);
+        closeItemDeleteModal();
+        return;
+    }
     router.delete(`/receiving/${itemDeleteRecord.value.recid}`, {
         onSuccess: () => {
             closeItemDeleteModal();
@@ -930,10 +1301,19 @@ const closeDeleteModal = () => {
     deleteRecord.value = null;
 };
 
+const openBatchDeleteConfirm = () => {
+    showBatchDeleteConfirm.value = true;
+};
+
+const closeBatchDeleteConfirm = () => {
+    showBatchDeleteConfirm.value = false;
+};
+
 const submitDelete = () => {
     if (!deleteRecord.value) return;
     router.delete(`/receiving/${deleteRecord.value.recid}`, {
         onSuccess: () => {
+            showBatchDeleteConfirm.value = false;
             closeDeleteModal();
             router.reload({ only: ['receivings', 'summary'] });
         },

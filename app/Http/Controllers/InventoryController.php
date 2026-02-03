@@ -22,7 +22,7 @@ class InventoryController extends Controller
     public function index(Request $request)
     {
         $cacheKey = 'inventory_list_' . ($request->user()->department ?? 'all');
-        
+
         $inventory = Cache::remember($cacheKey, 300, function () use ($request) {
             $query = Item::withInventory();
 
