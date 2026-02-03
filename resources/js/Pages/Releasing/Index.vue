@@ -1,13 +1,13 @@
 <template>
     <AppLayout>
-        <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Approval Queue
-            </h2>
-        </template>
-
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="py-6">
+            <div class="mx-auto max-w-7xl space-y-4 px-0 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="page-title">Approval Queue</h2>
+                        <p class="page-subtitle">Review and approve pending requests</p>
+                    </div>
+                </div>
                 <div class="bg-[#f6fbf6] overflow-hidden shadow-sm sm:rounded-lg ring-1 ring-[#cfe8d1] mb-6">
                     <div class="p-6">
                         <h3 class="text-lg font-medium mb-4">RIS Requests Pending Approval</h3>

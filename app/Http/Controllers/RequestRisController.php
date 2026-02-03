@@ -55,6 +55,7 @@ class RequestRisController extends Controller
                 'approvedToday' => $approvedToday,
                 'totalThisMonth' => $totalThisMonth,
             ],
+            'items' => Item::orderBy('itemname')->get(['itemcode', 'itemname']),
         ]);
     }
 

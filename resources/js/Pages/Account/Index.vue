@@ -1,15 +1,15 @@
 <template>
     <AppLayout>
-        <template #header>
-            <div class="flex items-center justify-between">
-                <div>
-                    <h2 class="page-title">User Management</h2>
-                    <p class="page-subtitle">Create and manage system users</p>
+        <div class="py-6">
+            <div class="mx-auto max-w-7xl space-y-4 px-0 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="page-title">User Management</h2>
+                        <p class="page-subtitle">Create and manage system users</p>
+                    </div>
                 </div>
-            </div>
-        </template>
 
-        <div class="space-y-6">
+                <div class="space-y-6">
             <!-- Create user form -->
             <div class="rounded-2xl border border-[#cfe8d1] bg-[#f6fbf6] p-6 shadow-sm">
                 <h3 class="mb-4 text-base font-semibold text-gray-900">Add New User</h3>
@@ -87,7 +87,7 @@
 
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
+                        <thead class="bg-[#e8f5e9]">
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                                     Name
@@ -115,7 +115,7 @@
                                     No users found.
                                 </td>
                             </tr>
-                            <tr v-for="user in users.data" :key="user.useid" class="hover:bg-gray-50">
+                            <tr v-for="user in users.data" :key="user.useid" class="hover:bg-[#e8f5e9]">
                                 <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
                                     {{ user.fullname }}
                                 </td>
@@ -161,14 +161,16 @@
                             :class="[
                                 'px-3 py-2 text-sm border rounded transition',
                                 link.active
-                                    ? 'bg-indigo-600 text-white border-indigo-600'
-                                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50',
+                                    ? 'bg-[#2e7d32] text-white border-[#2e7d32]'
+                                    : 'bg-[#e8f5e9] text-[#1b5e20] border-[#cfe8d1] hover:bg-[#dff1e1]',
                                 !link.url ? 'opacity-50 cursor-not-allowed' : ''
                             ]"
                             v-html="link.label"
                         />
                     </div>
                 </div>
+            </div>
+        </div>
             </div>
         </div>
     </AppLayout>
@@ -242,6 +244,8 @@ const roleBadgeClass = (role: string) => {
     return 'bg-green-100 text-green-800';
 };
 </script>
+
+
 
 
 

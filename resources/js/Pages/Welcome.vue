@@ -5,7 +5,7 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
+                        <div class="w-10 h-10 bg-[#2e7d32] rounded-lg flex items-center justify-center">
                             <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                             </svg>
@@ -14,7 +14,7 @@
                     </div>
                     <Link
                         href="/login"
-                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#2e7d32] hover:bg-[#256628] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2e7d32] transition-colors"
                     >
                         Sign In
                     </Link>
@@ -117,7 +117,7 @@
             </div>
 
             <!-- CTA Section -->
-            <div class="bg-indigo-600 rounded-2xl shadow-xl p-12 text-center">
+            <div class="bg-[#2e7d32] rounded-2xl shadow-xl p-12 text-center">
                 <h3 class="text-3xl font-bold text-white mb-4">
                     Ready to Get Started?
                 </h3>
@@ -149,6 +149,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 </script>
+
 
 
 

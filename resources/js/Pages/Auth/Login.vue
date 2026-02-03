@@ -2,7 +2,7 @@
     <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">
         <div class="bg-[#f6fbf6] rounded-2xl shadow-xl ring-1 ring-[#cfe8d1] w-full max-w-md p-8">
             <div class="flex items-center justify-center mb-8">
-                <div class="bg-indigo-600 p-3 rounded-xl">
+                <div class="bg-[#2e7d32] p-3 rounded-xl">
                     <!-- Pill icon (inline SVG, lucide-style) -->
                     <svg class="w-10 h-10 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 13.5 13.5 10.5" />
@@ -41,7 +41,7 @@
                             v-model="form.username"
                             type="text"
                             autocomplete="username"
-                            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2e7d32]"
                             placeholder="Enter your username"
                             required
                         />
@@ -72,7 +72,7 @@
                             v-model="form.password"
                             type="password"
                             autocomplete="current-password"
-                            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2e7d32]"
                             placeholder="Enter your password"
                             required
                         />
@@ -100,7 +100,7 @@
                 <button
                     type="submit"
                     :disabled="form.processing"
-                    class="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                    class="w-full bg-[#2e7d32] text-white py-3 rounded-lg font-semibold hover:bg-[#256628] transition-colors disabled:opacity-50"
                 >
                     <span v-if="form.processing">Signing in...</span>
                     <span v-else>Sign In</span>
@@ -135,6 +135,7 @@ const submit = () => {
     });
 };
 </script>
+
 
 
 

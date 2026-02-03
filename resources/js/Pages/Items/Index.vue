@@ -63,7 +63,7 @@
                                         No medicines found.
                                     </td>
                                 </tr>
-                                <tr v-for="medicine in items.data" :key="medicine.itemcode" class="hover:bg-gray-50">
+                                <tr v-for="medicine in items.data" :key="medicine.itemcode" class="hover:bg-[#e8f5e9]">
                                     <td class="whitespace-nowrap px-6 py-2 text-sm text-gray-900">
                                         {{ formatItemCode(medicine.itemcode) }}
                                     </td>
@@ -188,14 +188,14 @@
             <div class="-mx-6 -mb-6 mt-5 rounded-b-lg bg-gray-600 px-6 py-4 flex items-center justify-end space-x-2 min-h-[56px]">
                 <Button
                     variant="secondary"
-                    class="bg-white text-gray-600 hover:bg-gray-50 focus:ring-white h-9"
+                    class="bg-white text-gray-600 hover:bg-[#dff1e1] focus:ring-white h-9"
                     @click="closeViewModal"
                 >
                     Close
                 </Button>
                 <Button
                     variant="secondary"
-                    class="bg-white text-gray-600 hover:bg-gray-50 focus:ring-white h-9"
+                    class="bg-white text-gray-600 hover:bg-[#dff1e1] focus:ring-white h-9"
                     @click="closeViewModal"
                 >
                     Done
@@ -270,7 +270,10 @@
                     </div>
                 </div>
 
-                <div class="-mx-6 -mb-6 mt-4 rounded-b-lg bg-blue-600 px-6 py-4 flex items-center justify-end space-x-2 min-h-[56px]">
+                <div
+                    class="-mx-6 -mb-6 mt-4 rounded-b-lg px-6 py-4 flex items-center justify-end space-x-2 min-h-[56px]"
+                    :class="isEditMode ? 'bg-blue-600' : 'bg-[#2e7d32]'"
+                >
                     <Button
                         variant="danger"
                         type="button"
@@ -414,3 +417,5 @@ const formatItemCode = (code: number) => {
     return `MED-${String(code).padStart(6, '0')}`;
 };
 </script>
+
+

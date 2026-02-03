@@ -1,25 +1,23 @@
 <template>
     <AppLayout>
-        <template #header>
-            <div class="flex items-center justify-between">
-                <div>
-                    <h2 class="page-title">Request</h2>
-                    <p class="page-subtitle">Submit and track medicine requests</p>
+        <div class="py-6">
+            <div class="mx-auto max-w-7xl space-y-4 px-0 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="page-title">Request</h2>
+                        <p class="page-subtitle">Submit and track medicine requests</p>
+                    </div>
+                    <button
+                        type="button"
+                        class="btn-primary"
+                        @click="openRequestModal"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                        <span>New Request</span>
+                    </button>
                 </div>
-                <Link
-                    href="/requests/ris/create"
-                    class="btn-primary"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                    </svg>
-                    <span>New Request</span>
-                </Link>
-            </div>
-        </template>
-
-        <div class="py-10">
-            <div class="mx-auto max-w-7xl space-y-6 px-0 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                     <SummaryCard
                         title="Pending Requests"
@@ -48,7 +46,7 @@
 
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
+                            <thead class="bg-[#e8f5e9]">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                                         Request ID
@@ -76,7 +74,7 @@
                                         No requests found.
                                     </td>
                                 </tr>
-                                <tr v-for="request in requests.data" :key="request.req_ris" class="hover:bg-gray-50">
+                                <tr v-for="request in requests.data" :key="request.req_ris" class="hover:bg-[#e8f5e9]">
                                     <td class="whitespace-nowrap px-6 py-4 text-sm font-semibold text-gray-900">
                                         {{ formatReqId(request.req_ris) }}
                                     </td>
@@ -114,8 +112,8 @@
                                 :class="[
                                     'px-3 py-2 text-sm border rounded transition',
                                     link.active
-                                        ? 'bg-indigo-600 text-white border-indigo-600'
-                                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50',
+                                        ? 'bg-[#2e7d32] text-white border-[#2e7d32]'
+                                        : 'bg-[#e8f5e9] text-[#1b5e20] border-[#cfe8d1] hover:bg-[#dff1e1]',
                                     !link.url ? 'opacity-50 cursor-not-allowed' : ''
                                 ]"
                                 v-html="link.label"
@@ -125,13 +123,90 @@
                 </div>
             </div>
         </div>
+
+        <Modal :show="showRequestModal" :showFooter="false" @close="closeRequestModal">
+            <div class="-mx-6 -mt-6 mb-6 rounded-t-lg bg-blue-600 px-6 py-4 text-white">
+                <h3 class="text-lg font-semibold">New Request</h3>
+                <p class="text-sm text-white/80">Submit a medicine request.</p>
+            </div>
+            <form @submit.prevent="submitRequest">
+                <div class="space-y-6">
+                    <Select
+                        id="itemcode"
+                        v-model="form.itemcode"
+                        label="Medicine"
+                        :options="itemOptions"
+                        required
+                        :error="form.errors.itemcode"
+                    />
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <Input
+                            id="req_qty"
+                            v-model="form.req_qty"
+                            label="Quantity"
+                            type="number"
+                            step="0.01"
+                            required
+                            :error="form.errors.req_qty"
+                        />
+
+                        <Input
+                            id="division"
+                            v-model="form.division"
+                            label="Division"
+                            :error="form.errors.division"
+                        />
+                    </div>
+
+                    <Input
+                        id="department"
+                        v-model="form.department"
+                        label="Department"
+                        :error="form.errors.department"
+                    />
+
+                    <Input
+                        id="remarks"
+                        v-model="form.remarks"
+                        label="Remarks"
+                        type="textarea"
+                        :error="form.errors.remarks"
+                    />
+                </div>
+
+                <div class="-mx-6 -mb-6 mt-5 rounded-b-lg bg-blue-600 px-6 py-4 flex items-center justify-end space-x-2 min-h-[56px]">
+                    <Button
+                        variant="danger"
+                        type="button"
+                        class="bg-white text-blue-600 hover:bg-blue-50 focus:ring-white h-9"
+                        @click="closeRequestModal"
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        variant="secondary"
+                        type="submit"
+                        class="bg-white text-blue-600 hover:bg-blue-50 focus:ring-white h-9"
+                        :disabled="form.processing"
+                    >
+                        Submit Request
+                    </Button>
+                </div>
+            </form>
+        </Modal>
     </AppLayout>
 </template>
 
 <script setup lang="ts">
-import { defineComponent } from 'vue';
-import { Link } from '@inertiajs/vue3';
+import { defineComponent, computed, ref } from 'vue';
+import { Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Modal from '@/Components/Modal.vue';
+import Input from '@/Components/Input.vue';
+import Select from '@/Components/Select.vue';
+import Button from '@/Components/Button.vue';
+import type { Item } from '@/Types';
 
 interface RequestItem {
     req_ris: number;
@@ -158,10 +233,45 @@ interface Props {
         total?: number;
     };
     summary: Summary;
+    items: Item[];
 }
 
 const props = defineProps<Props>();
 const { requests, summary } = props;
+
+const showRequestModal = ref(false);
+
+const itemOptions = computed(() => {
+    return props.items.map(item => ({
+        value: item.itemcode,
+        label: item.itemname,
+    }));
+});
+
+const form = useForm({
+    itemcode: '',
+    req_qty: '',
+    division: '',
+    department: '',
+    remarks: '',
+});
+
+const openRequestModal = () => {
+    showRequestModal.value = true;
+};
+
+const closeRequestModal = () => {
+    showRequestModal.value = false;
+};
+
+const submitRequest = () => {
+    form.post('/requests/ris', {
+        onSuccess: () => {
+            showRequestModal.value = false;
+            form.reset();
+        },
+    });
+};
 
 const formatReqId = (id: number | string) => {
     const padded = String(id).padStart(4, '0');
@@ -202,6 +312,8 @@ const SummaryCard = defineComponent({
     `,
 });
 </script>
+
+
 
 
 

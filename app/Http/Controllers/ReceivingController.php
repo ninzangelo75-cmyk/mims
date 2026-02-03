@@ -24,28 +24,82 @@ class ReceivingController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Receiving::with('item')->orderBy('datereceived', 'desc');
+        $query = DB::table('receiving as r')
+            ->leftJoin('items as i', 'r.itemcode', '=', 'i.itemcode')
+            ->select(
+                DB::raw('MIN(r.recid) as recid'),
+                'r.batchno',
+                'r.supplier',
+                'r.referenceno',
+                DB::raw('COUNT(*) as total_items'),
+                DB::raw('MAX(r.datereceived) as datereceived'),
+                DB::raw('MIN(r.itemcode) as itemcode'),
+                DB::raw('MIN(i.itemname) as itemname'),
+                DB::raw('SUM(r.qty) as qty'),
+                DB::raw('MIN(r.uom) as uom'),
+                DB::raw('AVG(r.unitprice) as unitprice'),
+                DB::raw('SUM(r.totalamount) as totalamount'),
+                DB::raw('MIN(r.expirydate) as expirydate'),
+                DB::raw('MIN(r.department) as department')
+            )
+            ->groupBy('r.batchno', 'r.supplier', 'r.referenceno')
+            ->orderByDesc('datereceived');
 
-        if ($request->has('search')) {
+        if ($request->filled('search')) {
             $search = $request->search;
-            $query->whereHas('item', function ($q) use ($search) {
-                $q->where('itemname', 'like', "%{$search}%");
-            })->orWhere('batchno', 'like', "%{$search}%")
-              ->orWhere('supplier', 'like', "%{$search}%");
+            $query->where(function ($q) use ($search) {
+                $q->where('i.itemname', 'like', "%{$search}%")
+                    ->orWhere('r.batchno', 'like', "%{$search}%")
+                    ->orWhere('r.supplier', 'like', "%{$search}%")
+                    ->orWhere('r.referenceno', 'like', "%{$search}%");
+            });
         }
 
-        $receivings = $query->paginate(15)->through(function ($receiving) {
+        $receivings = $query->paginate(15);
+
+        $batchNumbers = $receivings->pluck('batchno')->filter()->unique()->values();
+        $batchItems = $batchNumbers->isEmpty()
+            ? collect()
+            : Receiving::with('item')
+                ->whereIn('batchno', $batchNumbers)
+                ->orderBy('batchno')
+                ->orderBy('datereceived')
+                ->get()
+                ->groupBy('batchno');
+
+        $receivings = $receivings->through(function ($receiving) use ($batchItems) {
+            $items = $batchItems->get($receiving->batchno, collect())
+                ->map(function ($item) {
+                    return [
+                        'recid' => $item->recid,
+                        'itemcode' => $item->itemcode,
+                        'itemname' => $item->item->itemname ?? 'N/A',
+                        'qty' => $item->qty,
+                        'uom' => $item->uom,
+                        'unitprice' => $item->unitprice,
+                        'totalamount' => $item->totalamount,
+                        'expirydate' => $item->expirydate?->format('Y-m-d'),
+                    ];
+                })
+                ->values()
+                ->all();
+
             return [
                 'recid' => $receiving->recid,
-                'datereceived' => $receiving->datereceived?->format('Y-m-d H:i:s'),
-                'itemname' => $receiving->item->itemname ?? 'N/A',
+                'datereceived' => $receiving->datereceived ? date('Y-m-d H:i:s', strtotime($receiving->datereceived)) : null,
+                'itemcode' => $receiving->itemcode,
+                'itemname' => $receiving->itemname ?? 'N/A',
                 'batchno' => $receiving->batchno,
                 'qty' => $receiving->qty,
                 'uom' => $receiving->uom,
                 'unitprice' => $receiving->unitprice,
                 'totalamount' => $receiving->totalamount,
-                'expirydate' => $receiving->expirydate?->format('Y-m-d'),
+                'expirydate' => $receiving->expirydate ? date('Y-m-d', strtotime($receiving->expirydate)) : null,
                 'supplier' => $receiving->supplier,
+                'referenceno' => $receiving->referenceno,
+                'department' => $receiving->department,
+                'total_items' => (int) ($receiving->total_items ?? 0),
+                'items' => $items,
             ];
         });
 
@@ -61,6 +115,7 @@ class ReceivingController extends Controller
             'receivings' => $receivings,
             'summary' => $summary,
             'filters' => $request->only(['search']),
+            'items' => Item::orderBy('itemname')->get(['itemcode', 'itemname', 'default_uom', 'description', 'brand', 'dosage_form', 'strength']),
         ]);
     }
 
@@ -108,5 +163,48 @@ class ReceivingController extends Controller
             return back()->withErrors(['error' => 'Failed to record stock-in: ' . $e->getMessage()])
                 ->withInput();
         }
+    }
+
+    /**
+     * Update an existing receiving record
+     */
+    public function update(Request $request, Receiving $receiving)
+    {
+        $validated = $request->validate([
+            'itemcode' => ['required', 'exists:items,itemcode'],
+            'supplier' => ['nullable', 'string', 'max:200'],
+            'referenceno' => ['nullable', 'string', 'max:150'],
+            'qty' => ['required', 'numeric', 'min:0.01'],
+            'uom' => ['required', 'string', 'max:50'],
+            'unitprice' => ['required', 'numeric', 'min:0'],
+            'batchno' => ['required', 'string', 'max:100'],
+            'expirydate' => ['required', 'date', 'after:today'],
+            'department' => ['nullable', 'string', 'max:150'],
+        ]);
+
+        $previousItemcode = $receiving->itemcode;
+        $validated['totalamount'] = $validated['qty'] * $validated['unitprice'];
+
+        $receiving->update($validated);
+
+        cache()->forget("inventory_item_{$previousItemcode}");
+        cache()->forget("inventory_item_{$receiving->itemcode}");
+
+        return redirect()->route('receiving.index')
+            ->with('message', 'Receiving record updated successfully.');
+    }
+
+    /**
+     * Delete a receiving record
+     */
+    public function destroy(Receiving $receiving)
+    {
+        $itemcode = $receiving->itemcode;
+        $receiving->delete();
+
+        cache()->forget("inventory_item_{$itemcode}");
+
+        return redirect()->route('receiving.index')
+            ->with('message', 'Receiving record deleted successfully.');
     }
 }

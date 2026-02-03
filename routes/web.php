@@ -22,7 +22,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('items', \App\Http\Controllers\ItemController::class);
 
     // Receiving (Staff/Admin)
-    Route::resource('receiving', \App\Http\Controllers\ReceivingController::class)->only(['index', 'create', 'store']);
+    Route::resource('receiving', \App\Http\Controllers\ReceivingController::class)->only(['index', 'create', 'store', 'update', 'destroy']);
 
     // Inventory (All authenticated users)
     Route::get('/inventory', [\App\Http\Controllers\InventoryController::class, 'index'])->name('inventory.index');

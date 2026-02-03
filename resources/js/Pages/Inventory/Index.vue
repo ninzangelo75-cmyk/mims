@@ -1,14 +1,13 @@
 <template>
     <AppLayout>
-        <template #header>
-            <div>
-                <h2 class="page-title">Inventory</h2>
-                <p class="page-subtitle">Monitor medicine stock levels</p>
-            </div>
-        </template>
-
-        <div class="py-10">
-            <div class="mx-auto max-w-7xl space-y-6 px-0 sm:px-6 lg:px-8">
+        <div class="py-6">
+            <div class="mx-auto max-w-7xl space-y-4 px-0 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="page-title">Inventory</h2>
+                        <p class="page-subtitle">Monitor medicine stock levels</p>
+                    </div>
+                </div>
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                     <SummaryCard
                         title="Total Items"
@@ -40,7 +39,7 @@
 
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
+                            <thead class="bg-[#e8f5e9]">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                                         Medicine Name
@@ -65,7 +64,7 @@
                                         No inventory data found.
                                     </td>
                                 </tr>
-                                <tr v-for="item in inventory" :key="item.itemcode" class="hover:bg-gray-50">
+                                <tr v-for="item in inventory" :key="item.itemcode" class="hover:bg-[#e8f5e9]">
                                     <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
                                         {{ item.itemname }}
                                     </td>
@@ -165,6 +164,7 @@ const SummaryCard = defineComponent({
     `,
 });
 </script>
+
 
 
 

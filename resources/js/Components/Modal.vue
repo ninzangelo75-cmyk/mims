@@ -24,7 +24,7 @@
                     >
                         <div
                             v-if="show"
-                            class="relative transform overflow-hidden rounded-lg bg-[#F8FAFC] text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
+                            :class="['relative transform overflow-hidden rounded-lg bg-[#F8FAFC] text-left shadow-xl transition-all sm:my-8 sm:w-full', maxWidth]"
                             @click.stop
                         >
                             <div class="bg-[#F8FAFC] px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
@@ -55,10 +55,12 @@ interface Props {
     show: boolean;
     title?: string;
     showFooter?: boolean;
+    maxWidth?: string;
 }
 
 withDefaults(defineProps<Props>(), {
     showFooter: true,
+    maxWidth: 'sm:max-w-lg',
 });
 
 defineEmits<{
