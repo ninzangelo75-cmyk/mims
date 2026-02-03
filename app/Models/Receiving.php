@@ -13,7 +13,7 @@ class Receiving extends Model
 
     protected $primaryKey = 'recid';
     public $incrementing = true;
-    protected $keyType = 'bigint';
+    protected $keyType = 'int';
 
     protected $fillable = [
         'itemcode',

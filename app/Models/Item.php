@@ -13,7 +13,7 @@ class Item extends Model
 
     protected $primaryKey = 'itemcode';
     public $incrementing = true;
-    protected $keyType = 'bigint';
+    protected $keyType = 'int';
 
     protected $fillable = [
         'itemname',

@@ -13,7 +13,7 @@ class ReleasingPtr extends Model
 
     protected $primaryKey = 'rel_ptr_id';
     public $incrementing = true;
-    protected $keyType = 'bigint';
+    protected $keyType = 'int';
 
     protected $fillable = [
         'ptr_no',

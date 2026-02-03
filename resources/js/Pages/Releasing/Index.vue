@@ -8,7 +8,7 @@
 
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="bg-[#f6fbf6] overflow-hidden shadow-sm sm:rounded-lg ring-1 ring-[#cfe8d1] mb-6">
                     <div class="p-6">
                         <h3 class="text-lg font-medium mb-4">RIS Requests Pending Approval</h3>
                         <DataTable
@@ -23,7 +23,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-[#f6fbf6] overflow-hidden shadow-sm sm:rounded-lg ring-1 ring-[#cfe8d1]">
                     <div class="p-6">
                         <h3 class="text-lg font-medium mb-4">PTR Requests Pending Approval</h3>
                         <DataTable
@@ -93,4 +93,6 @@ const ptrActions = [
     },
 ];
 </script>
+
+
 

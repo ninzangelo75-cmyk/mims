@@ -13,7 +13,7 @@
             :required="required"
             :disabled="disabled"
             :class="[
-                'block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm',
+                'block w-full rounded-md border-gray-300 px-3 py-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm',
                 error ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : '',
                 disabled ? 'bg-gray-100 cursor-not-allowed' : ''
             ]"
@@ -28,7 +28,7 @@
             :disabled="disabled"
             rows="3"
             :class="[
-                'block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm',
+                'block w-full rounded-md border-gray-300 px-3 py-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm',
                 error ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : '',
                 disabled ? 'bg-gray-100 cursor-not-allowed' : ''
             ]"

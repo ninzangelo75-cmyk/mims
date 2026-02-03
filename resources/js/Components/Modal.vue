@@ -10,7 +10,7 @@
         >
             <div
                 v-if="show"
-                class="fixed inset-0 z-50 overflow-y-auto"
+                class="fixed inset-0 z-50 overflow-y-auto bg-gray-900/40 backdrop-blur-sm"
                 @click.self="$emit('close')"
             >
                 <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
@@ -24,10 +24,10 @@
                     >
                         <div
                             v-if="show"
-                            class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
+                            class="relative transform overflow-hidden rounded-lg bg-[#F8FAFC] text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
                             @click.stop
                         >
-                            <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                            <div class="bg-[#F8FAFC] px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                                 <div v-if="title" class="mb-4">
                                     <h3 class="text-lg font-medium leading-6 text-gray-900">
                                         {{ title }}
@@ -35,7 +35,7 @@
                                 </div>
                                 <slot />
                             </div>
-                            <div v-if="showFooter" class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                            <div v-if="showFooter" class="bg-[#dff1e1] px-4 py-3 sm:flex sm:justify-end sm:items-center sm:gap-2 sm:px-6">
                                 <slot name="footer">
                                     <Button @click="$emit('close')">Close</Button>
                                 </slot>

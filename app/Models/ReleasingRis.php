@@ -13,7 +13,7 @@ class ReleasingRis extends Model
 
     protected $primaryKey = 'rel_ris_id';
     public $incrementing = true;
-    protected $keyType = 'bigint';
+    protected $keyType = 'int';
 
     protected $fillable = [
         'req_ris',

@@ -2,8 +2,8 @@
     <AppLayout>
         <template #header>
             <div>
-                <h2 class="text-2xl font-bold text-gray-900">Inventory</h2>
-                <p class="text-sm text-gray-600">Monitor medicine stock levels</p>
+                <h2 class="page-title">Inventory</h2>
+                <p class="page-subtitle">Monitor medicine stock levels</p>
             </div>
         </template>
 
@@ -33,7 +33,7 @@
                     />
                 </div>
 
-                <div class="overflow-hidden rounded-2xl bg-white shadow">
+                <div class="overflow-hidden rounded-2xl bg-[#f6fbf6] shadow ring-1 ring-[#cfe8d1]">
                     <div class="border-b border-gray-200 px-6 py-4">
                         <h3 class="text-base font-semibold text-gray-900">Current Inventory Status</h3>
                     </div>
@@ -59,7 +59,7 @@
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-200 bg-white">
+                            <tbody class="divide-y divide-gray-200 bg-[#f6fbf6]">
                                 <tr v-if="!inventory.length">
                                     <td colspan="5" class="px-6 py-6 text-center text-sm text-gray-500">
                                         No inventory data found.
@@ -151,9 +151,9 @@ const SummaryCard = defineComponent({
         iconPath: { type: String, required: true },
     },
     template: `
-        <div class="flex items-center justify-between rounded-xl bg-white p-5 shadow-sm ring-1 ring-gray-100">
+        <div class="flex items-center justify-between rounded-xl bg-[#f6fbf6] p-5 shadow-sm ring-1 ring-[#cfe8d1]">
             <div>
-                <p class="text-sm text-gray-600">{{ title }}</p>
+                <p class="page-subtitle">{{ title }}</p>
                 <p class="mt-2 text-3xl font-bold text-gray-900">{{ value }}</p>
             </div>
             <div :class="['flex h-12 w-12 items-center justify-center rounded-xl', iconBg]">
@@ -165,3 +165,6 @@ const SummaryCard = defineComponent({
     `,
 });
 </script>
+
+
+

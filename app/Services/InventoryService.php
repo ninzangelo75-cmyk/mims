@@ -56,5 +56,38 @@ class InventoryService
             return $receiving;
         });
     }
+
+    /**
+     * Record multiple stock-in transactions in a single batch
+     *
+     * @param array<int, array<string, mixed>> $items
+     * @return array<int, Receiving>
+     */
+    public function recordStockInMany(
+        array $items,
+        ?string $supplier = null,
+        ?string $referenceno = null,
+        ?string $department = null
+    ): array {
+        return DB::transaction(function () use ($items, $supplier, $referenceno, $department) {
+            $receivings = [];
+
+            foreach ($items as $item) {
+                $receivings[] = $this->recordStockIn(
+                    (int) $item['itemcode'],
+                    (float) $item['qty'],
+                    (string) $item['batchno'],
+                    (string) $item['expirydate'],
+                    (string) $item['uom'],
+                    (float) $item['unitprice'],
+                    $supplier,
+                    $referenceno,
+                    $department
+                );
+            }
+
+            return $receivings;
+        });
+    }
 }
 

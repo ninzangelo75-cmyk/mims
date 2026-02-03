@@ -1,6 +1,6 @@
 <template>
     <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
+        <div class="bg-[#f6fbf6] rounded-2xl shadow-xl ring-1 ring-[#cfe8d1] w-full max-w-md p-8">
             <div class="flex items-center justify-center mb-8">
                 <div class="bg-indigo-600 p-3 rounded-xl">
                     <!-- Pill icon (inline SVG, lucide-style) -->
@@ -90,7 +90,7 @@
                             type="checkbox"
                             class="w-4 h-4 text-indigo-600 border-gray-300 rounded"
                         />
-                        <span class="ml-2 text-sm text-gray-600">Remember me</span>
+                        <span class="ml-2 page-subtitle">Remember me</span>
                     </label>
                     <a href="#" class="text-sm text-indigo-600 hover:text-indigo-700">
                         Forgot password?
@@ -108,7 +108,7 @@
             </form>
 
             <div class="mt-6 text-center">
-                <p class="text-sm text-gray-600">
+                <p class="page-subtitle">
                     Demo credentials: use your username and password
                 </p>
             </div>
@@ -135,4 +135,6 @@ const submit = () => {
     });
 };
 </script>
+
+
 

@@ -1,11 +1,11 @@
 <template>
-    <div class="flex h-screen bg-gray-100">
+    <div class="flex h-screen bg-[#f6fbf6]">
         <!-- Sidebar -->
         <aside
-            class="bg-indigo-900 text-white transition-all duration-300 flex flex-col"
+            class="bg-[#1b5e20] text-white transition-all duration-300 flex flex-col"
             :class="isCollapsed ? 'w-20' : 'w-64'"
         >
-            <div class="p-4 flex items-center justify-between border-b border-indigo-800">
+            <div class="p-4 flex items-center justify-between border-b border-[#2e7d32]">
                 <div v-if="!isCollapsed" class="flex items-center space-x-2">
                     <Icon name="pill" className="w-8 h-8" />
                     <span class="font-bold text-lg">SKPH - MIMS</span>
@@ -21,7 +21,7 @@
                     :key="item.id"
                     :href="item.href"
                     class="w-full flex items-center space-x-3 px-4 py-3 transition-colors"
-                    :class="isActive(item) ? 'bg-indigo-800 border-r-4 border-white' : 'hover:bg-indigo-800'"
+                    :class="isActive(item) ? 'bg-[#2e7d32] border-r-4 border-[#e8f5e9]' : 'hover:bg-[#2e7d32]'"
                 >
                     <Icon :name="item.icon" :className="`${isCollapsed ? 'mx-auto ' : ''}w-5 h-5`" />
                     <span v-if="!isCollapsed" class="text-sm">{{ item.label }}</span>
@@ -31,7 +31,7 @@
             <button
                 type="button"
                 @click="toggleSidebar"
-                class="p-4 flex items-center justify-center border-t border-indigo-800 hover:bg-indigo-800 transition-colors"
+                class="p-4 flex items-center justify-center border-t border-[#2e7d32] hover:bg-[#2e7d32] transition-colors"
             >
                 <Icon v-if="isCollapsed" name="chevron-right" className="w-5 h-5" />
                 <div v-else class="flex items-center space-x-2">
@@ -44,33 +44,33 @@
         <!-- Main -->
         <div class="flex-1 flex flex-col overflow-hidden">
             <!-- Top header -->
-            <header class="bg-white border-b border-gray-200 px-6 py-4">
+            <header class="bg-[#e8f5e9] border-b border-[#cfe8d1] px-6 py-4">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-900">Medicine Inventory System</h1>
-                        <p class="text-sm text-gray-600">Manage your pharmaceutical inventory efficiently</p>
+                        <h1 class="text-2xl font-bold text-[#1b5e20]">Medicine Inventory System</h1>
+                        <p class="text-sm text-[#1b5e20]/80">Manage your pharmaceutical inventory efficiently</p>
                     </div>
 
                     <div class="flex items-center space-x-4">
                         <button
                             type="button"
-                            class="relative p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                            class="relative p-2 text-[#1b5e20] hover:bg-white/60 rounded-lg transition-colors"
                             title="Notifications"
                         >
                             <Icon name="bell" className="w-5 h-5" />
                             <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                         </button>
 
-                        <div class="flex items-center space-x-3 pl-4 border-l border-gray-300">
+                        <div class="flex items-center space-x-3 pl-4 border-l border-[#cfe8d1]">
                             <div class="text-right">
-                                <p class="text-sm font-medium text-gray-900">
+                                <p class="text-sm font-medium text-[#1b5e20]">
                                     {{ user?.fullname || 'User' }}
                                 </p>
-                                <p class="text-xs text-gray-600">
+                                <p class="text-xs text-[#1b5e20]/80">
                                     {{ roleLabel }}
                                 </p>
                             </div>
-                            <div class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-semibold">
+                            <div class="w-10 h-10 bg-[#2e7d32] rounded-full flex items-center justify-center text-white font-semibold">
                                 {{ initials }}
                             </div>
                         </div>
@@ -78,7 +78,7 @@
                         <button
                             type="button"
                             @click="logout"
-                            class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                            class="p-2 text-[#1b5e20] hover:bg-white/60 rounded-lg transition-colors"
                             title="Sign Out"
                         >
                             <Icon name="log-out" className="w-5 h-5" />
@@ -90,7 +90,7 @@
             <FlashMessage />
 
             <main class="flex-1 overflow-y-auto">
-                <div v-if="$slots.header" class="bg-gray-50 border-b border-gray-200">
+                <div v-if="$slots.header" class="bg-[#e8f5e9] border-b border-[#cfe8d1]">
                     <div class="px-6 py-6">
                         <slot name="header" />
                     </div>

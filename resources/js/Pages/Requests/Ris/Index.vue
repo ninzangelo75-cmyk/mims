@@ -3,12 +3,12 @@
         <template #header>
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-900">Request</h2>
-                    <p class="text-sm text-gray-600">Submit and track medicine requests</p>
+                    <h2 class="page-title">Request</h2>
+                    <p class="page-subtitle">Submit and track medicine requests</p>
                 </div>
                 <Link
                     href="/requests/ris/create"
-                    class="inline-flex items-center space-x-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    class="btn-primary"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -41,7 +41,7 @@
                     />
                 </div>
 
-                <div class="overflow-hidden rounded-2xl bg-white shadow">
+                <div class="overflow-hidden rounded-2xl bg-[#f6fbf6] shadow ring-1 ring-[#cfe8d1]">
                     <div class="border-b border-gray-200 px-6 py-4">
                         <h3 class="text-base font-semibold text-gray-900">Request History</h3>
                     </div>
@@ -70,7 +70,7 @@
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-200 bg-white">
+                            <tbody class="divide-y divide-gray-200 bg-[#f6fbf6]">
                                 <tr v-if="!requests.data.length">
                                     <td colspan="6" class="px-6 py-6 text-center text-sm text-gray-500">
                                         No requests found.
@@ -188,9 +188,9 @@ const SummaryCard = defineComponent({
         iconBg: { type: String, required: true },
     },
     template: `
-        <div class="flex items-center justify-between rounded-xl bg-white p-5 shadow-sm ring-1 ring-gray-100">
+        <div class="flex items-center justify-between rounded-xl bg-[#f6fbf6] p-5 shadow-sm ring-1 ring-[#cfe8d1]">
             <div>
-                <p class="text-sm text-gray-600">{{ title }}</p>
+                <p class="page-subtitle">{{ title }}</p>
                 <p class="mt-2 text-3xl font-bold text-gray-900">{{ value }}</p>
             </div>
             <div :class="['flex h-12 w-12 items-center justify-center rounded-xl', iconBg]">
@@ -202,3 +202,7 @@ const SummaryCard = defineComponent({
     `,
 });
 </script>
+
+
+
+

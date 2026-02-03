@@ -9,3 +9,11 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+@layer components {
+  .btn-primary { @apply inline-flex items-center gap-2 rounded-lg bg-[#2e7d32] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#256628] focus:outline-none focus:ring-2 focus:ring-[#2e7d32] focus:ring-offset-2; }
+  .btn-secondary { @apply inline-flex items-center gap-2 rounded-lg bg-[#e8f5e9] px-4 py-2 text-sm font-semibold text-[#1b5e20] shadow-sm transition hover:bg-[#dff1e1] focus:outline-none focus:ring-2 focus:ring-[#2e7d32] focus:ring-offset-2; }
+  .page-title { @apply text-2xl font-bold text-[#1b5e20]; }
+  .page-subtitle { @apply text-sm text-[#1b5e20]/80; }
+}
+

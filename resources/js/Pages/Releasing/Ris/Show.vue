@@ -8,11 +8,11 @@
 
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-[#f6fbf6] overflow-hidden shadow-sm sm:rounded-lg ring-1 ring-[#cfe8d1]">
                     <div class="p-6">
                         <div class="mb-6">
-                            <p class="text-sm text-gray-600">Medicine: <span class="font-medium">{{ request.item?.itemname }}</span></p>
-                            <p class="text-sm text-gray-600">Requested Quantity: <span class="font-medium">{{ request.req_qty }}</span></p>
+                            <p class="page-subtitle">Medicine: <span class="font-medium">{{ request.item?.itemname }}</span></p>
+                            <p class="page-subtitle">Requested Quantity: <span class="font-medium">{{ request.req_qty }}</span></p>
                         </div>
 
                         <form @submit.prevent="submit" class="space-y-4">
@@ -20,7 +20,7 @@
                                 <div class="flex items-center justify-between mb-2">
                                     <div>
                                         <span class="font-medium">Batch: {{ batch.batchno }}</span>
-                                        <span class="text-sm text-gray-600 ml-4">Expiry: {{ batch.expirydate }}</span>
+                                        <span class="page-subtitle ml-4">Expiry: {{ batch.expirydate }}</span>
                                     </div>
                                     <span class="text-sm">Available: {{ batch.available_qty }}</span>
                                 </div>
@@ -92,4 +92,6 @@ const submit = () => {
     form.post(`/releasing/ris/${props.request.req_ris}`);
 };
 </script>
+
+
 

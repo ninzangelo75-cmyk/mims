@@ -13,7 +13,7 @@ class RequestPtr extends Model
 
     protected $primaryKey = 'req_ptr';
     public $incrementing = true;
-    protected $keyType = 'bigint';
+    protected $keyType = 'int';
 
     protected $fillable = [
         'ptr_no',

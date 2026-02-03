@@ -82,25 +82,21 @@ class ReceivingController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'itemcode' => ['required', 'exists:items,itemcode'],
             'supplier' => ['nullable', 'string', 'max:200'],
             'referenceno' => ['nullable', 'string', 'max:150'],
-            'qty' => ['required', 'numeric', 'min:0.01'],
-            'uom' => ['required', 'string', 'max:50'],
-            'unitprice' => ['required', 'numeric', 'min:0'],
-            'batchno' => ['required', 'string', 'max:100'],
-            'expirydate' => ['required', 'date', 'after:today'],
             'department' => ['nullable', 'string', 'max:150'],
+            'items' => ['required', 'array', 'min:1'],
+            'items.*.itemcode' => ['required', 'exists:items,itemcode'],
+            'items.*.qty' => ['required', 'numeric', 'min:0.01'],
+            'items.*.uom' => ['required', 'string', 'max:50'],
+            'items.*.unitprice' => ['required', 'numeric', 'min:0'],
+            'items.*.batchno' => ['required', 'string', 'max:100'],
+            'items.*.expirydate' => ['required', 'date', 'after:today'],
         ]);
 
         try {
-            $receiving = $this->inventoryService->recordStockIn(
-                $validated['itemcode'],
-                $validated['qty'],
-                $validated['batchno'],
-                $validated['expirydate'],
-                $validated['uom'],
-                $validated['unitprice'],
+            $this->inventoryService->recordStockInMany(
+                $validated['items'],
                 $validated['supplier'] ?? null,
                 $validated['referenceno'] ?? null,
                 $validated['department'] ?? null

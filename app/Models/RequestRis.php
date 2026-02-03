@@ -13,7 +13,7 @@ class RequestRis extends Model
 
     protected $primaryKey = 'req_ris';
     public $incrementing = true;
-    protected $keyType = 'bigint';
+    protected $keyType = 'int';
 
     protected $fillable = [
         'ris_no',

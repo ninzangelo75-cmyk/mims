@@ -3,15 +3,15 @@
         <template #header>
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-900">User Management</h2>
-                    <p class="text-sm text-gray-600">Create and manage system users</p>
+                    <h2 class="page-title">User Management</h2>
+                    <p class="page-subtitle">Create and manage system users</p>
                 </div>
             </div>
         </template>
 
         <div class="space-y-6">
             <!-- Create user form -->
-            <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+            <div class="rounded-2xl border border-[#cfe8d1] bg-[#f6fbf6] p-6 shadow-sm">
                 <h3 class="mb-4 text-base font-semibold text-gray-900">Add New User</h3>
                 <form class="grid gap-4 md:grid-cols-2" @submit.prevent="submit">
                     <Input
@@ -80,7 +80,7 @@
             </div>
 
             <!-- Users table -->
-            <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+            <div class="overflow-hidden rounded-2xl border border-[#cfe8d1] bg-[#f6fbf6] shadow-sm">
                 <div class="border-b border-gray-200 px-6 py-4">
                     <h3 class="text-base font-semibold text-gray-900">Existing Users</h3>
                 </div>
@@ -109,7 +109,7 @@
                                 </th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200 bg-white">
+                        <tbody class="divide-y divide-gray-200 bg-[#f6fbf6]">
                             <tr v-if="!users.data.length">
                                 <td colspan="6" class="px-6 py-6 text-center text-sm text-gray-500">
                                     No users found.
@@ -242,4 +242,7 @@ const roleBadgeClass = (role: string) => {
     return 'bg-green-100 text-green-800';
 };
 </script>
+
+
+
 

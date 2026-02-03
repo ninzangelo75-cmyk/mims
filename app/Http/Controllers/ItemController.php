@@ -31,10 +31,11 @@ class ItemController extends Controller
             });
         }
 
-        $items = $query->orderBy('itemname')->paginate(15)->through(function ($item) {
+        $items = $query->orderBy('itemcode', 'asc')->paginate(15)->through(function ($item) {
             return [
                 'itemcode' => $item->itemcode,
                 'itemname' => $item->itemname,
+                'description' => $item->description,
                 'brand' => $item->brand,
                 'dosage_form' => $item->dosage_form,
                 'strength' => $item->strength,
