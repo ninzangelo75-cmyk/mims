@@ -53,14 +53,11 @@
                                     <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                                         Status
                                     </th>
-                                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                                        Actions
-                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200 bg-[#f6fbf6]">
                                 <tr v-if="!inventory.length">
-                                    <td colspan="5" class="px-6 py-6 text-center text-sm text-gray-500">
+                                    <td colspan="4" class="px-6 py-6 text-center text-sm text-gray-500">
                                         No inventory data found.
                                     </td>
                                 </tr>
@@ -79,11 +76,6 @@
                                             {{ item.status }}
                                         </span>
                                     </td>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm font-medium">
-                                        <Link :href="`/requests/ris/create?item=${item.itemcode}`" class="text-indigo-600 hover:text-indigo-900">
-                                            Reorder
-                                        </Link>
-                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -96,7 +88,6 @@
 
 <script setup lang="ts">
 import { defineComponent } from 'vue';
-import { Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 interface InventoryItem {

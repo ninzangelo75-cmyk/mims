@@ -22,9 +22,18 @@ class RequestPtrController extends Controller
             return [
                 'req_ptr' => $request->req_ptr,
                 'ptr_no' => $request->ptr_no,
+                'itemcode' => $request->itemcode,
                 'itemname' => $request->item->itemname ?? 'N/A',
                 'req_qty' => $request->req_qty,
+                'division' => $request->division,
+                'target' => $request->target,
                 'trans_type' => $request->trans_type,
+                'trans_type_other' => $request->trans_type_other,
+                'remarks' => $request->remarks,
+                'purpose' => $request->purpose,
+                'requested_by' => 'N/A',
+                'department' => $request->department ?? null,
+                'isavailable' => true,
                 'requestedat' => $request->requestedat?->format('Y-m-d H:i:s'),
             ];
         });
@@ -81,5 +90,41 @@ class RequestPtrController extends Controller
 
         return redirect()->route('requests.ptr.index')
             ->with('message', 'PTR request created successfully.');
+    }
+
+    public function update(Request $request, RequestPtr $ptr)
+    {
+        $validated = $request->validate([
+            'itemcode' => ['required', 'exists:items,itemcode'],
+            'req_qty' => ['required', 'numeric', 'min:0.01'],
+            'division' => ['nullable', 'string', 'max:150'],
+            'target' => ['nullable', 'string', 'max:150'],
+            'trans_type' => ['required', 'in:Donation,Reassignment,Relocate,Others'],
+            'trans_type_other' => ['nullable', 'required_if:trans_type,Others', 'string', 'max:150'],
+            'remarks' => ['nullable', 'string'],
+            'purpose' => ['nullable', 'string'],
+        ]);
+
+        $ptr->update([
+            'itemcode' => $validated['itemcode'],
+            'req_qty' => $validated['req_qty'],
+            'division' => $validated['division'] ?? null,
+            'target' => $validated['target'] ?? null,
+            'trans_type' => $validated['trans_type'],
+            'trans_type_other' => $validated['trans_type_other'] ?? null,
+            'remarks' => $validated['remarks'] ?? null,
+            'purpose' => $validated['purpose'] ?? null,
+        ]);
+
+        return redirect()->route('requests.ptr.index')
+            ->with('message', 'PTR request updated successfully.');
+    }
+
+    public function destroy(RequestPtr $ptr)
+    {
+        $ptr->delete();
+
+        return redirect()->route('requests.ptr.index')
+            ->with('message', 'PTR request deleted successfully.');
     }
 }

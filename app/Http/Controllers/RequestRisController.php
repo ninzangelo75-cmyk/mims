@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\RequestRis;
+use App\Models\RequestPtr;
 use App\Models\Item;
 use App\Services\AvailabilityService;
 use Illuminate\Http\Request;
@@ -31,8 +32,12 @@ class RequestRisController extends Controller
             return [
                 'req_ris' => $request->req_ris,
                 'ris_no' => $request->ris_no,
+                'itemcode' => $request->itemcode,
                 'itemname' => $request->item->itemname ?? 'N/A',
                 'req_qty' => $request->req_qty,
+                'division' => $request->division,
+                'department' => $request->department,
+                'remarks' => $request->remarks,
                 'isavailable' => $request->isavailable,
                 'requested_by' => $request->requester?->fullname ?? 'N/A',
                 'requestedat' => $request->requestedat?->format('Y-m-d H:i:s'),
@@ -56,6 +61,28 @@ class RequestRisController extends Controller
                 'totalThisMonth' => $totalThisMonth,
             ],
             'items' => Item::orderBy('itemname')->get(['itemcode', 'itemname']),
+            'ptrRequests' => RequestPtr::with('item')
+                ->orderBy('requestedat', 'desc')
+                ->paginate(15)
+                ->through(function ($request) {
+                    return [
+                        'req_ptr' => $request->req_ptr,
+                        'ptr_no' => $request->ptr_no,
+                        'itemcode' => $request->itemcode,
+                        'itemname' => $request->item->itemname ?? 'N/A',
+                        'req_qty' => $request->req_qty,
+                        'division' => $request->division,
+                        'target' => $request->target,
+                        'trans_type' => $request->trans_type,
+                        'trans_type_other' => $request->trans_type_other,
+                        'remarks' => $request->remarks,
+                        'purpose' => $request->purpose,
+                        'requested_by' => 'N/A',
+                        'department' => $request->department ?? null,
+                        'isavailable' => true,
+                        'requestedat' => $request->requestedat?->format('Y-m-d H:i:s'),
+                    ];
+                }),
         ]);
     }
 
@@ -108,5 +135,41 @@ class RequestRisController extends Controller
 
         return redirect()->route('requests.ris.index')
             ->with('message', 'RIS request created successfully.');
+    }
+
+    public function update(Request $request, RequestRis $ris)
+    {
+        $validated = $request->validate([
+            'itemcode' => ['required', 'exists:items,itemcode'],
+            'req_qty' => ['required', 'numeric', 'min:0.01'],
+            'division' => ['nullable', 'string', 'max:150'],
+            'department' => ['nullable', 'string', 'max:150'],
+            'remarks' => ['nullable', 'string'],
+        ]);
+
+        $availability = $this->availabilityService->checkAvailability(
+            $validated['itemcode'],
+            $validated['req_qty']
+        );
+
+        $ris->update([
+            'itemcode' => $validated['itemcode'],
+            'req_qty' => $validated['req_qty'],
+            'division' => $validated['division'] ?? null,
+            'department' => $validated['department'] ?? $ris->department,
+            'remarks' => $validated['remarks'] ?? null,
+            'isavailable' => $availability['available'],
+        ]);
+
+        return redirect()->route('requests.ris.index')
+            ->with('message', 'RIS request updated successfully.');
+    }
+
+    public function destroy(RequestRis $ris)
+    {
+        $ris->delete();
+
+        return redirect()->route('requests.ris.index')
+            ->with('message', 'RIS request deleted successfully.');
     }
 }

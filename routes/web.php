@@ -29,8 +29,8 @@ Route::middleware('auth')->group(function () {
 
     // Requests
     Route::prefix('requests')->name('requests.')->group(function () {
-        Route::resource('ris', \App\Http\Controllers\RequestRisController::class)->only(['index', 'create', 'store']);
-        Route::resource('ptr', \App\Http\Controllers\RequestPtrController::class)->only(['index', 'create', 'store']);
+        Route::resource('ris', \App\Http\Controllers\RequestRisController::class)->only(['index', 'create', 'store', 'update', 'destroy']);
+        Route::resource('ptr', \App\Http\Controllers\RequestPtrController::class)->only(['index', 'create', 'store', 'update', 'destroy']);
     });
 
     // Approvals & Releasing

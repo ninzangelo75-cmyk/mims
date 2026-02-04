@@ -19,6 +19,28 @@
                             <template #cell-ris_no="{ value }">
                                 <span class="font-medium">{{ value }}</span>
                             </template>
+                            <template #actions="{ row }">
+                                <button
+                                    type="button"
+                                    class="mr-1 inline-flex h-8 w-8 items-center justify-center rounded-md bg-blue-600 text-white shadow-sm transition hover:bg-blue-700"
+                                    @click="approveRis(row)"
+                                >
+                                    <span class="sr-only">Approve</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                    </svg>
+                                </button>
+                                <button
+                                    type="button"
+                                    class="inline-flex h-8 w-8 items-center justify-center rounded-md bg-gray-500 text-white shadow-sm transition hover:bg-gray-600"
+                                    @click="releaseRis(row)"
+                                >
+                                    <span class="sr-only">Release</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6" />
+                                    </svg>
+                                </button>
+                            </template>
                         </DataTable>
                     </div>
                 </div>
@@ -34,6 +56,18 @@
                             <template #cell-ptr_no="{ value }">
                                 <span class="font-medium">{{ value }}</span>
                             </template>
+                            <template #actions="{ row }">
+                                <button
+                                    type="button"
+                                    class="inline-flex h-8 w-8 items-center justify-center rounded-md bg-blue-600 text-white shadow-sm transition hover:bg-blue-700"
+                                    @click="approvePtr(row)"
+                                >
+                                    <span class="sr-only">Approve</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                    </svg>
+                                </button>
+                            </template>
                         </DataTable>
                     </div>
                 </div>
@@ -46,7 +80,6 @@
 import { router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import DataTable from '@/Components/DataTable.vue';
-import Button from '@/Components/Button.vue';
 
 interface Props {
     risRequests: any[];
@@ -69,29 +102,20 @@ const ptrColumns = [
     { key: 'trans_type', label: 'Type' },
 ];
 
-const risActions = [
-    {
-        label: 'Approve',
-        onClick: (row: any) => {
-            router.post(`/approvals/ris/${row.req_ris}/approve`);
-        },
-    },
-    {
-        label: 'Release',
-        onClick: (row: any) => {
-            router.visit(`/releasing/ris/${row.req_ris}`);
-        },
-    },
-];
+const risActions = [{ label: 'Actions', onClick: () => undefined }];
+const ptrActions = [{ label: 'Actions', onClick: () => undefined }];
 
-const ptrActions = [
-    {
-        label: 'Approve',
-        onClick: (row: any) => {
-            router.post(`/approvals/ptr/${row.req_ptr}/approve`);
-        },
-    },
-];
+const approveRis = (row: any) => {
+    router.post(`/approvals/ris/${row.req_ris}/approve`);
+};
+
+const releaseRis = (row: any) => {
+    router.visit(`/releasing/ris/${row.req_ris}`);
+};
+
+const approvePtr = (row: any) => {
+    router.post(`/approvals/ptr/${row.req_ptr}/approve`);
+};
 </script>
 
 

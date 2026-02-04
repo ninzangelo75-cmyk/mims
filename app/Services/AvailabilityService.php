@@ -13,7 +13,7 @@ class AvailabilityService
     public function checkAvailability(int $itemcode, float $reqQty): array
     {
         $item = Item::withInventory()
-            ->where('itemcode', $itemcode)
+            ->where('items.itemcode', $itemcode)
             ->first();
 
         if (!$item) {

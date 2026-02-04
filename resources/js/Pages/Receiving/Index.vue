@@ -439,7 +439,7 @@
             </form>
         </Modal>
 
-        <Modal :show="showBatchAddModal" :showFooter="false" maxWidth="sm:max-w-4xl" @close="closeBatchAddModal">
+        <Modal :show="showBatchAddModal" :showFooter="false" maxWidth="sm:max-w-4xl" @close="requestBatchAddClose">
             <div class="-mx-6 -mt-6 mb-6 rounded-t-lg bg-blue-600 px-6 py-4 text-white">
                 <h3 class="text-lg font-semibold">Add Item</h3>
                 <p class="text-sm text-white/80">Add a new item to this batch.</p>
@@ -488,14 +488,36 @@
                                 <span class="font-semibold text-[#2e7d32]">{{ formatMoney(addItemTotal) }}</span>
                             </p>
                         </div>
-                        <div class="col-span-9 flex justify-end">
-                            <Button class="btn-primary" type="button" @click="addItemToBatch">Add Item</Button>
-                        </div>
                     </div>
                 </div>
             </div>
             <div class="-mx-6 -mb-6 mt-5 rounded-b-lg bg-blue-600 px-6 py-4 flex items-center justify-end space-x-2 min-h-[56px]">
-                <Button variant="danger" class="bg-white text-blue-600 hover:bg-blue-50 focus:ring-white h-9" @click="closeBatchAddModal">Cancel</Button>
+                <Button variant="danger" class="bg-white text-blue-600 hover:bg-blue-50 focus:ring-white h-9" @click="requestBatchAddClose">Cancel</Button>
+                <Button variant="secondary" class="bg-white text-blue-600 hover:bg-blue-50 focus:ring-white h-9" @click="addItemToBatch">Add Item</Button>
+            </div>
+        </Modal>
+
+        <Modal :show="showAddItemConfirm" :showFooter="false" @close="showAddItemConfirm = false">
+            <div class="-mx-6 -mt-6 mb-6 rounded-t-lg bg-blue-600 px-6 py-4 text-white">
+                <h3 class="text-lg font-semibold">Confirm Add</h3>
+                <p class="text-sm text-white/80">Add this item to the batch?</p>
+            </div>
+            <p class="text-sm text-gray-700">Please confirm you want to add the item to the list.</p>
+            <div class="-mx-6 -mb-6 mt-5 rounded-b-lg bg-blue-600 px-6 py-4 flex items-center justify-end space-x-2 min-h-[56px]">
+                <Button variant="secondary" class="bg-white text-blue-600 hover:bg-blue-50 focus:ring-white h-9" @click="showAddItemConfirm = false">Cancel</Button>
+                <Button variant="secondary" class="bg-white text-blue-600 hover:bg-blue-50 focus:ring-white h-9" @click="confirmAddItem">Add Item</Button>
+            </div>
+        </Modal>
+
+        <Modal :show="showAddItemCancelConfirm" :showFooter="false" @close="closeAddItemCancelConfirm">
+            <div class="-mx-6 -mt-6 mb-6 rounded-t-lg bg-blue-600 px-6 py-4 text-white">
+                <h3 class="text-lg font-semibold">Discard Changes?</h3>
+                <p class="text-sm text-white/80">You have entered item details.</p>
+            </div>
+            <p class="text-sm text-gray-700">Canceling will discard the current item entry. Continue?</p>
+            <div class="-mx-6 -mb-6 mt-5 rounded-b-lg bg-blue-600 px-6 py-4 flex items-center justify-end space-x-2 min-h-[56px]">
+                <Button variant="secondary" class="bg-white text-blue-600 hover:bg-blue-50 focus:ring-white h-9" @click="closeAddItemCancelConfirm">Keep Editing</Button>
+                <Button variant="secondary" class="bg-white text-blue-600 hover:bg-blue-50 focus:ring-white h-9" @click="confirmAddItemDiscard">Discard</Button>
             </div>
         </Modal>
 
@@ -637,6 +659,8 @@ const showBatchCancelConfirm = ref(false);
 const showBatchDeleteConfirm = ref(false);
 const showItemCancelConfirm = ref(false);
 const showBatchAddModal = ref(false);
+const showAddItemConfirm = ref(false);
+const showAddItemCancelConfirm = ref(false);
 const showDeleteModal = ref(false);
 
 const viewRecord = ref<ReceivingRecord | null>(null);
@@ -785,6 +809,16 @@ const addItemTotal = computed(() => {
     const qty = parseFloat(addItemForm.value.qty) || 0;
     const price = parseFloat(addItemForm.value.unitprice) || 0;
     return qty * price;
+});
+
+const hasAddItemData = computed(() => {
+    return !!(
+        addItemForm.value.itemcode ||
+        addItemForm.value.expirydate ||
+        addItemForm.value.qty ||
+        addItemForm.value.uom ||
+        addItemForm.value.unitprice
+    );
 });
 
 const grandTotal = computed(() => {
@@ -1070,8 +1104,27 @@ const openBatchAddModal = () => {
     showBatchAddModal.value = true;
 };
 
+const requestBatchAddClose = () => {
+    if (hasAddItemData.value) {
+        showAddItemCancelConfirm.value = true;
+        return;
+    }
+    closeBatchAddModal();
+};
+
+const closeAddItemCancelConfirm = () => {
+    showAddItemCancelConfirm.value = false;
+};
+
+const confirmAddItemDiscard = () => {
+    showAddItemCancelConfirm.value = false;
+    closeBatchAddModal();
+};
+
 const closeBatchAddModal = () => {
     showBatchAddModal.value = false;
+    showAddItemConfirm.value = false;
+    showAddItemCancelConfirm.value = false;
 };
 
 const addItemToBatch = () => {
@@ -1092,6 +1145,12 @@ const addItemToBatch = () => {
     if (!addItemForm.value.unitprice) addItemErrors.value.unitprice = 'Required';
 
     if (Object.values(addItemErrors.value).some(error => error)) return;
+
+    showAddItemConfirm.value = true;
+};
+
+const confirmAddItem = () => {
+    showAddItemConfirm.value = false;
 
     const qty = parseFloat(addItemForm.value.qty) || 0;
     const price = parseFloat(addItemForm.value.unitprice) || 0;
