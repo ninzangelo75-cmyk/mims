@@ -37,7 +37,7 @@
                                         Type
                                     </th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                                        Date
+                                        Request Date
                                     </th>
                                 </tr>
                             </thead>
@@ -112,7 +112,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const formatDate = (value: string | null) => {
+const formatDate = (value: string | null | undefined) => {
     if (!value) return 'â€”';
     return new Date(value).toLocaleDateString();
 };

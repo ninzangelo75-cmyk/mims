@@ -16,7 +16,7 @@ class RequestPtrController extends Controller
 
     public function index(Request $request)
     {
-        $query = RequestPtr::with(['item'])->orderBy('requestedat', 'desc');
+        $query = RequestPtr::with(['item'])->orderBy('req_ptr', 'asc');
 
         $requests = $query->paginate(15)->through(function ($request) {
             return [

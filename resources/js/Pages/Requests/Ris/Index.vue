@@ -52,7 +52,7 @@
                                         RIS Request ID
                                     </th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                                        Medicine
+                                        Item
                                     </th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                                         Quantity
@@ -64,7 +64,7 @@
                                         Department
                                     </th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                                        Date
+                                        Request Date
                                     </th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                                         Status
@@ -165,12 +165,12 @@
                 </div>
 
                 <div class="mt-8 flex items-center justify-end">
-                    <Link href="/requests/ptr/create" class="btn-primary min-w-[190px]">
+                    <button type="button" class="btn-primary min-w-[190px]" @click="openPtrRequestModal">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                         </svg>
                         <span>New PTR Request</span>
-                    </Link>
+                    </button>
                 </div>
 
                 <div class="overflow-hidden rounded-2xl bg-[#f6fbf6] shadow ring-1 ring-[#cfe8d1]">
@@ -186,7 +186,7 @@
                                         PTR Request ID
                                     </th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                                        Medicine
+                                        Item
                                     </th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                                         Quantity
@@ -300,32 +300,52 @@
             </div>
         </div>
 
-        <Modal :show="showRequestModal" :showFooter="false" @close="closeRequestModal">
-            <div class="-mx-6 -mt-6 mb-6 rounded-t-lg bg-blue-600 px-6 py-4 text-white">
+        <Modal :show="showRequestModal" :showFooter="false" maxWidth="sm:max-w-4xl" @close="closeRequestModal">
+            <div class="-mx-6 -mt-6 mb-6 rounded-t-lg bg-[#2e7d32] px-6 py-4 text-white">
                 <h3 class="text-lg font-semibold">New Request</h3>
                 <p class="text-sm text-white/80">Submit a medicine request.</p>
             </div>
-            <form @submit.prevent="submitRequest">
+            <form @submit.prevent="openRisSubmitConfirm">
                 <div class="space-y-6">
-                    <Select
-                        id="itemcode"
-                        v-model="form.itemcode"
-                        label="Medicine"
-                        :options="itemOptions"
-                        required
-                        :error="form.errors.itemcode"
-                    />
+                    <div class="relative">
+                        <Select
+                            id="itemcode"
+                            v-model="form.itemcode"
+                            label="Medicine"
+                            :options="itemOptions"
+                            required
+                            @update:modelValue="showRisItemWarning = false"
+                        />
+                        <div
+                            v-if="showRisItemWarning"
+                            class="absolute left-28 top-16 z-10 flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2 text-xs text-gray-700 shadow"
+                        >
+                            <span class="inline-flex h-5 w-5 items-center justify-center rounded bg-orange-500 text-white text-xs font-bold">!</span>
+                            <span>Please fill out this field.</span>
+                            <span class="absolute -top-2 left-4 h-0 w-0 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-white"></span>
+                        </div>
+                    </div>
 
                     <div class="grid grid-cols-2 gap-4">
-                        <Input
-                            id="req_qty"
-                            v-model="form.req_qty"
-                            label="Quantity"
-                            type="number"
-                            step="0.01"
-                            required
-                            :error="form.errors.req_qty"
-                        />
+                        <div class="relative">
+                            <Input
+                                id="req_qty"
+                                v-model="form.req_qty"
+                                label="Quantity"
+                                type="number"
+                                step="0.01"
+                                required
+                                @update:modelValue="showRisQtyWarning = false"
+                            />
+                            <div
+                                v-if="showRisQtyWarning"
+                                class="absolute left-24 top-16 z-10 flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2 text-xs text-gray-700 shadow"
+                            >
+                                <span class="inline-flex h-5 w-5 items-center justify-center rounded bg-orange-500 text-white text-xs font-bold">!</span>
+                                <span>Please fill out this field.</span>
+                                <span class="absolute -top-2 left-4 h-0 w-0 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-white"></span>
+                            </div>
+                        </div>
 
                         <Input
                             id="division"
@@ -351,25 +371,58 @@
                     />
                 </div>
 
-                <div class="-mx-6 -mb-6 mt-5 rounded-b-lg bg-blue-600 px-6 py-4 flex items-center justify-end space-x-2 min-h-[56px]">
+                <div class="-mx-6 -mb-6 mt-5 rounded-b-lg bg-[#2e7d32] px-6 py-4 flex items-center justify-end space-x-2 min-h-[56px]">
                     <Button
                         variant="danger"
                         type="button"
-                        class="bg-white text-blue-600 hover:bg-blue-50 focus:ring-white h-9"
-                        @click="closeRequestModal"
+                        class="bg-white text-[#2e7d32] hover:bg-[#dff1e1] focus:ring-white h-9"
+                        @click="requestRisCancel"
                     >
                         Cancel
                     </Button>
                     <Button
                         variant="secondary"
-                        type="submit"
-                        class="bg-white text-blue-600 hover:bg-blue-50 focus:ring-white h-9"
+                        type="button"
+                        class="bg-white text-[#2e7d32] hover:bg-[#dff1e1] focus:ring-white h-9"
                         :disabled="form.processing"
+                        @click="openRisSubmitConfirm"
                     >
                         Submit Request
                     </Button>
                 </div>
             </form>
+        </Modal>
+
+        <Modal :show="showRisSubmitConfirm" :showFooter="false" @close="closeRisSubmitConfirm">
+            <div class="-mx-6 -mt-6 mb-6 rounded-t-lg bg-[#2e7d32] px-6 py-4 text-white">
+                <h3 class="text-lg font-semibold">Confirm Submit</h3>
+                <p class="text-sm text-white/80">Submit this RIS request?</p>
+            </div>
+            <p class="text-sm text-gray-700">Please confirm you want to submit the RIS request.</p>
+            <div class="-mx-6 -mb-6 mt-5 rounded-b-lg bg-[#2e7d32] px-6 py-4 flex items-center justify-end space-x-2 min-h-[56px]">
+                <Button variant="secondary" class="bg-white text-[#2e7d32] hover:bg-[#dff1e1] focus:ring-white h-9" @click="closeRisSubmitConfirm">
+                    Cancel
+                </Button>
+                <Button variant="secondary" class="bg-white text-[#2e7d32] hover:bg-[#dff1e1] focus:ring-white h-9" @click="confirmRisSubmit">
+                    Submit
+                </Button>
+            </div>
+        </Modal>
+
+        <Modal :show="showRisCancelConfirm" :showFooter="false" @close="closeRisCancelConfirm">
+            <div class="-mx-6 -mt-6 mb-6 rounded-t-lg bg-[#2e7d32] px-6 py-4 text-white">
+                <h3 class="text-lg font-semibold">Discard Request?</h3>
+                <p class="text-sm text-white/80">You have entered data.</p>
+            </div>
+            <p class="text-sm text-gray-700">Canceling will discard the current RIS request. Continue?</p>
+            <div class="-mx-6 -mb-6 mt-5 rounded-b-lg bg-[#2e7d32] px-6 py-4 flex items-center justify-end space-x-2 min-h-[56px]">
+                <Button variant="secondary" class="bg-white text-[#2e7d32] hover:bg-[#dff1e1] focus:ring-white h-9" @click="closeRisCancelConfirm">
+                    Keep Editing
+                </Button>
+                <Button variant="secondary" class="bg-white text-[#2e7d32] hover:bg-[#dff1e1] focus:ring-white h-9" @click="confirmRisCancel">
+                    Discard
+                </Button>
+            </div>
         </Modal>
 
         <Modal :show="showEditModal" :showFooter="false" @close="closeEditModal">
@@ -459,7 +512,7 @@
             </div>
             <div class="space-y-3 text-sm text-gray-700">
                 <div><span class="font-semibold text-[#1b5e20]">RIS No:</span> {{ viewRequest?.ris_no }}</div>
-                <div><span class="font-semibold text-[#1b5e20]">Medicine:</span> {{ viewRequest?.itemname }}</div>
+                <div><span class="font-semibold text-[#1b5e20]">Item:</span> {{ viewRequest?.itemname }}</div>
                 <div><span class="font-semibold text-[#1b5e20]">Quantity:</span> {{ viewRequest?.req_qty }}</div>
                 <div><span class="font-semibold text-[#1b5e20]">Division:</span> {{ viewRequest?.division || '-' }}</div>
                 <div><span class="font-semibold text-[#1b5e20]">Department:</span> {{ viewRequest?.department || '-' }}</div>
@@ -489,6 +542,145 @@
             </div>
         </Modal>
 
+        <Modal :show="showPtrRequestModal" :showFooter="false" maxWidth="sm:max-w-4xl" @close="closePtrRequestModal">
+            <div class="-mx-6 -mt-6 mb-6 rounded-t-lg bg-[#2e7d32] px-6 py-4 text-white">
+                <h3 class="text-lg font-semibold">New PTR Request</h3>
+                <p class="text-sm text-white/80">Submit a property transfer request.</p>
+            </div>
+            <form @submit.prevent="openPtrSubmitConfirm">
+                <div class="space-y-6">
+                    <div class="relative">
+                        <Select
+                            id="ptr_itemcode"
+                            v-model="ptrForm.itemcode"
+                            label="Item"
+                            :options="itemOptions"
+                            required
+                            @update:modelValue="showPtrItemWarning = false"
+                        />
+                        <div
+                            v-if="showPtrItemWarning"
+                            class="absolute left-24 top-16 z-10 flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2 text-xs text-gray-700 shadow"
+                        >
+                            <span class="inline-flex h-5 w-5 items-center justify-center rounded bg-orange-500 text-white text-xs font-bold">!</span>
+                            <span>Please fill out this field.</span>
+                            <span class="absolute -top-2 left-4 h-0 w-0 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-white"></span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="relative">
+                            <Input
+                                id="ptr_req_qty"
+                                v-model="ptrForm.req_qty"
+                                label="Quantity"
+                                type="number"
+                                step="0.01"
+                                required
+                                @update:modelValue="showPtrQtyWarning = false"
+                            />
+                            <div
+                                v-if="showPtrQtyWarning"
+                                class="absolute left-24 top-16 z-10 flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2 text-xs text-gray-700 shadow"
+                            >
+                                <span class="inline-flex h-5 w-5 items-center justify-center rounded bg-orange-500 text-white text-xs font-bold">!</span>
+                                <span>Please fill out this field.</span>
+                                <span class="absolute -top-2 left-4 h-0 w-0 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-white"></span>
+                            </div>
+                        </div>
+                        <Input
+                            id="ptr_division"
+                            v-model="ptrForm.division"
+                            label="Division"
+                            :error="ptrForm.errors.division"
+                        />
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <Input
+                            id="ptr_target"
+                            v-model="ptrForm.target"
+                            label="Target"
+                            :error="ptrForm.errors.target"
+                        />
+                        <Select
+                            id="ptr_trans_type_new"
+                            v-model="ptrForm.trans_type"
+                            label="Transfer Type"
+                            :options="ptrTypeOptions"
+                            required
+                            :error="ptrForm.errors.trans_type"
+                        />
+                    </div>
+
+                    <Input
+                        id="ptr_trans_type_other_new"
+                        v-model="ptrForm.trans_type_other"
+                        label="Other Type"
+                        :disabled="ptrForm.trans_type !== 'Others'"
+                        :error="ptrForm.errors.trans_type_other"
+                    />
+
+                    <Input
+                        id="ptr_remarks"
+                        v-model="ptrForm.remarks"
+                        label="Remarks"
+                        type="textarea"
+                        :error="ptrForm.errors.remarks"
+                    />
+
+                    <Input
+                        id="ptr_purpose"
+                        v-model="ptrForm.purpose"
+                        label="Purpose"
+                        type="textarea"
+                        :error="ptrForm.errors.purpose"
+                    />
+                </div>
+
+                <div class="-mx-6 -mb-6 mt-5 rounded-b-lg bg-[#2e7d32] px-6 py-4 flex items-center justify-end space-x-2 min-h-[56px]">
+                    <Button variant="danger" type="button" class="bg-white text-[#2e7d32] hover:bg-[#dff1e1] focus:ring-white h-9" @click="requestPtrCancel">
+                        Cancel
+                    </Button>
+                    <Button variant="secondary" type="button" class="bg-white text-[#2e7d32] hover:bg-[#dff1e1] focus:ring-white h-9" :disabled="ptrForm.processing" @click="openPtrSubmitConfirm">
+                        Submit PTR Request
+                    </Button>
+                </div>
+            </form>
+        </Modal>
+
+        <Modal :show="showPtrSubmitConfirm" :showFooter="false" @close="closePtrSubmitConfirm">
+            <div class="-mx-6 -mt-6 mb-6 rounded-t-lg bg-[#2e7d32] px-6 py-4 text-white">
+                <h3 class="text-lg font-semibold">Confirm Submit</h3>
+                <p class="text-sm text-white/80">Submit this PTR request?</p>
+            </div>
+            <p class="text-sm text-gray-700">Please confirm you want to submit the PTR request.</p>
+            <div class="-mx-6 -mb-6 mt-5 rounded-b-lg bg-[#2e7d32] px-6 py-4 flex items-center justify-end space-x-2 min-h-[56px]">
+                <Button variant="secondary" class="bg-white text-[#2e7d32] hover:bg-[#dff1e1] focus:ring-white h-9" @click="closePtrSubmitConfirm">
+                    Cancel
+                </Button>
+                <Button variant="secondary" class="bg-white text-[#2e7d32] hover:bg-[#dff1e1] focus:ring-white h-9" @click="confirmPtrSubmit">
+                    Submit
+                </Button>
+            </div>
+        </Modal>
+
+        <Modal :show="showPtrCancelConfirm" :showFooter="false" @close="closePtrCancelConfirm">
+            <div class="-mx-6 -mt-6 mb-6 rounded-t-lg bg-[#2e7d32] px-6 py-4 text-white">
+                <h3 class="text-lg font-semibold">Discard Request?</h3>
+                <p class="text-sm text-white/80">You have entered data.</p>
+            </div>
+            <p class="text-sm text-gray-700">Canceling will discard the current PTR request. Continue?</p>
+            <div class="-mx-6 -mb-6 mt-5 rounded-b-lg bg-[#2e7d32] px-6 py-4 flex items-center justify-end space-x-2 min-h-[56px]">
+                <Button variant="secondary" class="bg-white text-[#2e7d32] hover:bg-[#dff1e1] focus:ring-white h-9" @click="closePtrCancelConfirm">
+                    Keep Editing
+                </Button>
+                <Button variant="secondary" class="bg-white text-[#2e7d32] hover:bg-[#dff1e1] focus:ring-white h-9" @click="confirmPtrCancel">
+                    Discard
+                </Button>
+            </div>
+        </Modal>
+
         <Modal :show="showPtrViewModal" :showFooter="false" @close="closePtrViewModal">
             <div class="-mx-6 -mt-6 mb-6 rounded-t-lg bg-gray-600 px-6 py-4 text-white">
                 <h3 class="text-lg font-semibold">PTR Request Details</h3>
@@ -496,7 +688,7 @@
             </div>
             <div class="space-y-3 text-sm text-gray-700">
                 <div><span class="font-semibold text-[#1b5e20]">PTR Request ID:</span> {{ formatPtrId(ptrViewRequest?.req_ptr || '') }}</div>
-                <div><span class="font-semibold text-[#1b5e20]">Medicine:</span> {{ ptrViewRequest?.itemname }}</div>
+                <div><span class="font-semibold text-[#1b5e20]">Item:</span> {{ ptrViewRequest?.itemname }}</div>
                 <div><span class="font-semibold text-[#1b5e20]">Quantity:</span> {{ ptrViewRequest?.req_qty }}</div>
                 <div><span class="font-semibold text-[#1b5e20]">Division:</span> {{ ptrViewRequest?.division || '-' }}</div>
                 <div><span class="font-semibold text-[#1b5e20]">Target:</span> {{ ptrViewRequest?.target || '-' }}</div>
@@ -506,7 +698,7 @@
                 <div><span class="font-semibold text-[#1b5e20]">Remarks:</span> {{ ptrViewRequest?.remarks || '-' }}</div>
                 <div><span class="font-semibold text-[#1b5e20]">Requested By:</span> {{ ptrViewRequest?.requested_by || 'N/A' }}</div>
                 <div><span class="font-semibold text-[#1b5e20]">Department:</span> {{ ptrViewRequest?.department || '-' }}</div>
-                <div><span class="font-semibold text-[#1b5e20]">Requested At:</span> {{ formatDate(ptrViewRequest?.requestedat || null) }}</div>
+                <div><span class="font-semibold text-[#1b5e20]">Request Date:</span> {{ formatDate(ptrViewRequest?.requestedat || null) }}</div>
                 <div><span class="font-semibold text-[#1b5e20]">Status:</span> {{ statusLabel(!!ptrViewRequest?.isavailable) }}</div>
             </div>
             <div class="-mx-6 -mb-6 mt-5 rounded-b-lg bg-gray-600 px-6 py-4 flex items-center justify-end space-x-2 min-h-[56px]">
@@ -617,7 +809,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineComponent, computed, ref } from 'vue';
+import { defineComponent, computed, ref, watch } from 'vue';
 import { Link, useForm, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Modal from '@/Components/Modal.vue';
@@ -690,6 +882,10 @@ const showRequestModal = ref(false);
 const showEditModal = ref(false);
 const showDeleteModal = ref(false);
 const showViewModal = ref(false);
+const showRisSubmitConfirm = ref(false);
+const showRisCancelConfirm = ref(false);
+const showRisItemWarning = ref(false);
+const showRisQtyWarning = ref(false);
 const editingRequest = ref<RequestItem | null>(null);
 const requestToDelete = ref<RequestItem | null>(null);
 const viewRequest = ref<RequestItem | null>(null);
@@ -699,6 +895,11 @@ const showPtrDeleteModal = ref(false);
 const editingPtrRequest = ref<PtrRequestItem | null>(null);
 const ptrRequestToDelete = ref<PtrRequestItem | null>(null);
 const ptrViewRequest = ref<PtrRequestItem | null>(null);
+const showPtrRequestModal = ref(false);
+const showPtrSubmitConfirm = ref(false);
+const showPtrCancelConfirm = ref(false);
+const showPtrItemWarning = ref(false);
+const showPtrQtyWarning = ref(false);
 
 const itemOptions = computed(() => {
     return props.items.map(item => ({
@@ -734,12 +935,25 @@ const ptrEditForm = useForm({
     purpose: '',
 });
 
+const ptrForm = useForm({
+    itemcode: '',
+    req_qty: '',
+    division: '',
+    target: '',
+    trans_type: 'Donation',
+    trans_type_other: '',
+    remarks: '',
+    purpose: '',
+});
+
 const openRequestModal = () => {
     showRequestModal.value = true;
 };
 
 const closeRequestModal = () => {
     showRequestModal.value = false;
+    showRisItemWarning.value = false;
+    showRisQtyWarning.value = false;
 };
 
 const submitRequest = () => {
@@ -749,6 +963,155 @@ const submitRequest = () => {
             form.reset();
         },
     });
+};
+
+const hasRisFormData = computed(() => {
+    return !!(
+        form.itemcode ||
+        form.req_qty ||
+        form.division ||
+        form.department ||
+        form.remarks
+    );
+});
+
+const openRisSubmitConfirm = () => {
+    form.clearErrors();
+    showRisItemWarning.value = false;
+    showRisQtyWarning.value = false;
+    if (!form.itemcode) {
+        showRisItemWarning.value = true;
+    }
+    if (!form.req_qty) {
+        showRisQtyWarning.value = true;
+    }
+    if (showRisItemWarning.value || showRisQtyWarning.value) {
+        return;
+    }
+    showRisSubmitConfirm.value = true;
+};
+
+watch(
+    () => [form.itemcode, form.req_qty],
+    ([itemcode, reqQty]) => {
+        if (itemcode) {
+            showRisItemWarning.value = false;
+        }
+        if (reqQty) {
+            showRisQtyWarning.value = false;
+        }
+    }
+);
+
+const closeRisSubmitConfirm = () => {
+    showRisSubmitConfirm.value = false;
+};
+
+const confirmRisSubmit = () => {
+    showRisSubmitConfirm.value = false;
+    submitRequest();
+};
+
+const requestRisCancel = () => {
+    if (hasRisFormData.value) {
+        showRisCancelConfirm.value = true;
+        return;
+    }
+    closeRequestModal();
+};
+
+const closeRisCancelConfirm = () => {
+    showRisCancelConfirm.value = false;
+};
+
+const confirmRisCancel = () => {
+    showRisCancelConfirm.value = false;
+    closeRequestModal();
+};
+
+const openPtrRequestModal = () => {
+    showPtrRequestModal.value = true;
+};
+
+const closePtrRequestModal = () => {
+    showPtrRequestModal.value = false;
+    showPtrItemWarning.value = false;
+    showPtrQtyWarning.value = false;
+};
+
+const submitPtrRequest = () => {
+    ptrForm.post('/requests/ptr', {
+        onSuccess: () => {
+            showPtrRequestModal.value = false;
+            ptrForm.reset();
+        },
+    });
+};
+
+const hasPtrFormData = computed(() => {
+    return !!(
+        ptrForm.itemcode ||
+        ptrForm.req_qty ||
+        ptrForm.division ||
+        ptrForm.target ||
+        ptrForm.trans_type_other ||
+        ptrForm.remarks ||
+        ptrForm.purpose
+    );
+});
+
+const openPtrSubmitConfirm = () => {
+    ptrForm.clearErrors();
+    showPtrItemWarning.value = false;
+    showPtrQtyWarning.value = false;
+    if (!ptrForm.itemcode) {
+        showPtrItemWarning.value = true;
+    }
+    if (!ptrForm.req_qty) {
+        showPtrQtyWarning.value = true;
+    }
+    if (showPtrItemWarning.value || showPtrQtyWarning.value) {
+        return;
+    }
+    showPtrSubmitConfirm.value = true;
+};
+
+watch(
+    () => [ptrForm.itemcode, ptrForm.req_qty],
+    ([itemcode, reqQty]) => {
+        if (itemcode) {
+            showPtrItemWarning.value = false;
+        }
+        if (reqQty) {
+            showPtrQtyWarning.value = false;
+        }
+    }
+);
+
+const closePtrSubmitConfirm = () => {
+    showPtrSubmitConfirm.value = false;
+};
+
+const confirmPtrSubmit = () => {
+    showPtrSubmitConfirm.value = false;
+    submitPtrRequest();
+};
+
+const requestPtrCancel = () => {
+    if (hasPtrFormData.value) {
+        showPtrCancelConfirm.value = true;
+        return;
+    }
+    closePtrRequestModal();
+};
+
+const closePtrCancelConfirm = () => {
+    showPtrCancelConfirm.value = false;
+};
+
+const confirmPtrCancel = () => {
+    showPtrCancelConfirm.value = false;
+    closePtrRequestModal();
 };
 
 const openEditModal = (request: RequestItem) => {

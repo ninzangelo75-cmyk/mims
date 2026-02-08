@@ -22,7 +22,7 @@ class RequestRisController extends Controller
 
     public function index(Request $request)
     {
-        $query = RequestRis::with(['item', 'requester'])->orderBy('requestedat', 'desc');
+        $query = RequestRis::with(['item', 'requester'])->orderBy('req_ris', 'asc');
 
         if ($request->user()->role === 'USER') {
             $query->where('requestedby', $request->user()->useid);
@@ -62,7 +62,7 @@ class RequestRisController extends Controller
             ],
             'items' => Item::orderBy('itemname')->get(['itemcode', 'itemname']),
             'ptrRequests' => RequestPtr::with('item')
-                ->orderBy('requestedat', 'desc')
+                ->orderBy('req_ptr', 'asc')
                 ->paginate(15)
                 ->through(function ($request) {
                     return [
