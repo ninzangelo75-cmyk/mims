@@ -6,6 +6,7 @@ use App\Models\Item;
 use App\Models\Receiving;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
@@ -52,6 +53,14 @@ class InventoryController extends Controller
             ];
         });
 
+        if ($request->filled('search')) {
+            $search = Str::of($request->search)->lower()->toString();
+            $inventoryData = $inventoryData->filter(function ($item) use ($search) {
+                return Str::of($item['itemname'])->lower()->contains($search)
+                    || Str::of($item['status'])->lower()->contains($search);
+            })->values();
+        }
+
         $summary = [
             'totalItems' => $inventoryData->count(),
             'lowStockItems' => $inventoryData->whereIn('status', ['Low Stock', 'Critical'])->count(),
@@ -62,6 +71,7 @@ class InventoryController extends Controller
         return Inertia::render('Inventory/Index', [
             'inventory' => $inventoryData,
             'summary' => $summary,
+            'filters' => $request->only(['search']),
         ]);
     }
 }

@@ -88,6 +88,14 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M16 17l5-5-5-5" />
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 12H9" />
         </template>
+
+        <!-- dashboard -->
+        <template v-else-if="name === 'dashboard'">
+            <rect x="3" y="3" width="8" height="8" rx="1.5" />
+            <rect x="13" y="3" width="8" height="8" rx="1.5" />
+            <rect x="3" y="13" width="8" height="8" rx="1.5" />
+            <rect x="13" y="13" width="8" height="8" rx="1.5" />
+        </template>
     </svg>
 </template>
 
@@ -104,7 +112,8 @@ type IconName =
     | 'chevron-left'
     | 'chevron-right'
     | 'bell'
-    | 'log-out';
+    | 'log-out'
+    | 'dashboard';
 
 withDefaults(
     defineProps<{

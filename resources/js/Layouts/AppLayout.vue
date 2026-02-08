@@ -105,7 +105,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import FlashMessage from '@/Components/FlashMessage.vue';
 import Icon from '@/Components/Icon.vue';
@@ -115,6 +115,7 @@ const user = computed(() => page.props.auth.user as any);
 
 type MenuIcon =
     | 'pill'
+    | 'dashboard'
     | 'package-check'
     | 'package'
     | 'clipboard-list'
@@ -150,6 +151,7 @@ const menuItems = computed(() => {
     const role = user.value?.role as 'ADMIN' | 'STAFF' | 'USER' | undefined;
 
     const all: MenuItem[] = [
+        { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', href: '/dashboard', roles: ['ADMIN', 'STAFF', 'USER'] },
         { id: 'medicine-entry', label: 'Medicine Entry', icon: 'pill', href: '/items', roles: ['ADMIN'] },
         { id: 'receiving', label: 'Receiving', icon: 'package-check', href: '/receiving', roles: ['ADMIN', 'STAFF'] },
         { id: 'inventory', label: 'Inventory', icon: 'package', href: '/inventory', roles: ['ADMIN', 'STAFF', 'USER'] },
@@ -167,6 +169,30 @@ const menuItems = computed(() => {
 const logout = () => {
     router.post('/logout');
 };
+
+const idleTimeoutMs = 30_000;
+let idleTimer: ReturnType<typeof setTimeout> | null = null;
+const activityEvents = ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart'];
+
+const resetIdleTimer = () => {
+    if (idleTimer) clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => {
+        const url = (page.url || '/') as string;
+        if (!url.startsWith('/dashboard')) {
+            router.visit('/dashboard', { replace: true, preserveScroll: true });
+        }
+    }, idleTimeoutMs);
+};
+
+onMounted(() => {
+    activityEvents.forEach((event) => window.addEventListener(event, resetIdleTimer, { passive: true }));
+    resetIdleTimer();
+});
+
+onBeforeUnmount(() => {
+    activityEvents.forEach((event) => window.removeEventListener(event, resetIdleTimer));
+    if (idleTimer) clearTimeout(idleTimer);
+});
 
 const isActive = (item: MenuItem) => {
     const url = (page.url || '/') as string;

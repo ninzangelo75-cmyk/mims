@@ -1,17 +1,20 @@
 <template>
     <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
+        <table class="min-w-full table-fixed divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
                     <th
                         v-for="column in columns"
                         :key="column.key"
                         scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        :class="[
+                            'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
+                            column.headerClass || ''
+                        ]"
                     >
                         {{ column.label }}
                     </th>
-                    <th v-if="actions.length > 0" scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th v-if="actions.length > 0" scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
                         Actions
                     </th>
                 </tr>
@@ -21,13 +24,16 @@
                     <td
                         v-for="column in columns"
                         :key="column.key"
-                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        :class="[
+                            'px-6 py-4 whitespace-nowrap text-sm text-gray-900',
+                            column.cellClass || ''
+                        ]"
                     >
                         <slot :name="`cell-${column.key}`" :row="row" :value="row[column.key]">
                             {{ row[column.key] }}
                         </slot>
                     </td>
-                    <td v-if="actions.length > 0" class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <td v-if="actions.length > 0" class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium w-24">
                         <slot name="actions" :row="row">
                             <button
                                 v-for="action in actions"
@@ -54,6 +60,8 @@
 interface Column {
     key: string;
     label: string;
+    headerClass?: string;
+    cellClass?: string;
 }
 
 interface Action {

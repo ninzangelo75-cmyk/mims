@@ -8,6 +8,7 @@ use App\Models\Item;
 use App\Services\AvailabilityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class RequestRisController extends Controller
@@ -28,7 +29,29 @@ class RequestRisController extends Controller
             $query->where('requestedby', $request->user()->useid);
         }
 
-        $requests = $query->paginate(15)->through(function ($request) {
+        if ($request->filled('ris_search')) {
+            $search = $request->ris_search;
+            $status = Str::lower($search);
+            $query->where(function ($q) use ($search, $status) {
+                $q->where('ris_no', 'like', "%{$search}%")
+                    ->orWhere('department', 'like', "%{$search}%")
+                    ->orWhereHas('item', function ($item) use ($search) {
+                        $item->where('itemname', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('requester', function ($user) use ($search) {
+                        $user->where('fullname', 'like', "%{$search}%")
+                            ->orWhere('username', 'like', "%{$search}%");
+                    });
+
+                if (in_array($status, ['pending', 'approved'], true)) {
+                    $q->orWhere('isavailable', $status === 'approved');
+                }
+            });
+        }
+
+        $requests = $query->paginate(15)
+            ->appends($request->only(['ris_search', 'ptr_search']))
+            ->through(function ($request) {
             return [
                 'req_ris' => $request->req_ris,
                 'ris_no' => $request->ris_no,
@@ -62,8 +85,27 @@ class RequestRisController extends Controller
             ],
             'items' => Item::orderBy('itemname')->get(['itemcode', 'itemname']),
             'ptrRequests' => RequestPtr::with('item')
+                ->when($request->filled('ptr_search'), function ($q) use ($request) {
+                    $search = $request->ptr_search;
+                    $status = Str::lower($search);
+                    $q->where(function ($inner) use ($search, $status) {
+                        $inner->where('ptr_no', 'like', "%{$search}%")
+                            ->orWhere('division', 'like', "%{$search}%")
+                            ->orWhere('target', 'like', "%{$search}%")
+                            ->orWhereHas('item', function ($item) use ($search) {
+                                $item->where('itemname', 'like', "%{$search}%");
+                            });
+
+                        if ($status === 'pending') {
+                            $inner->orWhereNull('approvedat');
+                        } elseif ($status === 'approved') {
+                            $inner->orWhereNotNull('approvedat');
+                        }
+                    });
+                })
                 ->orderBy('req_ptr', 'asc')
                 ->paginate(15)
+                ->appends($request->only(['ris_search', 'ptr_search']))
                 ->through(function ($request) {
                     return [
                         'req_ptr' => $request->req_ptr,
@@ -83,6 +125,7 @@ class RequestRisController extends Controller
                         'requestedat' => $request->requestedat?->format('Y-m-d H:i:s'),
                     ];
                 }),
+            'filters' => $request->only(['ris_search', 'ptr_search']),
         ]);
     }
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\RequestPtr;
 use App\Models\Item;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class RequestPtrController extends Controller
@@ -18,7 +19,29 @@ class RequestPtrController extends Controller
     {
         $query = RequestPtr::with(['item'])->orderBy('req_ptr', 'asc');
 
-        $requests = $query->paginate(15)->through(function ($request) {
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $status = Str::lower($search);
+            $query->where(function ($q) use ($search, $status) {
+                $q->where('ptr_no', 'like', "%{$search}%")
+                    ->orWhere('division', 'like', "%{$search}%")
+                    ->orWhere('target', 'like', "%{$search}%")
+                    ->orWhere('trans_type', 'like', "%{$search}%")
+                    ->orWhereHas('item', function ($item) use ($search) {
+                        $item->where('itemname', 'like', "%{$search}%");
+                    });
+
+                if ($status === 'pending') {
+                    $q->orWhereNull('approvedat');
+                } elseif ($status === 'approved') {
+                    $q->orWhereNotNull('approvedat');
+                }
+            });
+        }
+
+        $requests = $query->paginate(15)
+            ->appends($request->only(['search']))
+            ->through(function ($request) {
             return [
                 'req_ptr' => $request->req_ptr,
                 'ptr_no' => $request->ptr_no,
@@ -40,6 +63,7 @@ class RequestPtrController extends Controller
 
         return Inertia::render('Requests/Ptr/Index', [
             'requests' => $requests,
+            'filters' => $request->only(['search']),
         ]);
     }
 

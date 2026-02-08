@@ -56,7 +56,7 @@ class ReceivingController extends Controller
             });
         }
 
-        $receivings = $query->paginate(15);
+        $receivings = $query->paginate(15)->appends($request->only(['search']));
 
         $batchNumbers = $receivings->pluck('batchno')->filter()->unique()->values();
         $batchItems = $batchNumbers->isEmpty()

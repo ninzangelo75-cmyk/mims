@@ -41,7 +41,21 @@
 
                 <div class="overflow-hidden rounded-2xl bg-[#f6fbf6] shadow ring-1 ring-[#cfe8d1]">
                     <div class="border-b border-gray-200 px-6 py-4">
-                        <h3 class="text-base font-semibold text-gray-900">RIS Request History</h3>
+                        <div class="flex items-center justify-between gap-4">
+                            <h3 class="text-base font-semibold text-gray-900">RIS Request History</h3>
+                            <div class="relative w-full max-w-xs">
+                                <svg class="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z" />
+                                </svg>
+                                <input
+                                    v-model="risSearch"
+                                    type="text"
+                                    placeholder="Search RIS requests..."
+                                    class="w-full rounded-lg border border-gray-300 pl-11 pr-4 py-2.5 text-sm shadow-sm transition focus:border-[#2e7d32] focus:outline-none focus:ring-2 focus:ring-[#2e7d32]"
+                                    @input="handleRisSearch"
+                                />
+                            </div>
+                        </div>
                     </div>
 
                     <div class="overflow-x-auto">
@@ -175,7 +189,21 @@
 
                 <div class="overflow-hidden rounded-2xl bg-[#f6fbf6] shadow ring-1 ring-[#cfe8d1]">
                     <div class="border-b border-gray-200 px-6 py-4">
-                        <h3 class="text-base font-semibold text-gray-900">PTR Request History</h3>
+                        <div class="flex items-center justify-between gap-4">
+                            <h3 class="text-base font-semibold text-gray-900">PTR Request History</h3>
+                            <div class="relative w-full max-w-xs">
+                                <svg class="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z" />
+                                </svg>
+                                <input
+                                    v-model="ptrSearch"
+                                    type="text"
+                                    placeholder="Search PTR requests..."
+                                    class="w-full rounded-lg border border-gray-300 pl-11 pr-4 py-2.5 text-sm shadow-sm transition focus:border-[#2e7d32] focus:outline-none focus:ring-2 focus:ring-[#2e7d32]"
+                                    @input="handlePtrSearch"
+                                />
+                            </div>
+                        </div>
                     </div>
 
                     <div class="overflow-x-auto">
@@ -873,10 +901,18 @@ interface Props {
         to?: number;
         total?: number;
     };
+    filters?: {
+        ris_search?: string;
+        ptr_search?: string;
+    };
 }
 
 const props = defineProps<Props>();
-const { requests, summary, ptrRequests } = props;
+const requests = computed(() => props.requests);
+const summary = computed(() => props.summary);
+const ptrRequests = computed(() => props.ptrRequests);
+const risSearch = ref(props.filters?.ris_search || '');
+const ptrSearch = ref(props.filters?.ptr_search || '');
 
 const showRequestModal = ref(false);
 const showEditModal = ref(false);
@@ -1045,6 +1081,30 @@ const submitPtrRequest = () => {
             showPtrRequestModal.value = false;
             ptrForm.reset();
         },
+    });
+};
+
+const handleRisSearch = () => {
+    const risValue = risSearch.value.trim();
+    const ptrValue = ptrSearch.value.trim();
+    router.get('/requests/ris', {
+        ...(risValue ? { ris_search: risValue } : {}),
+        ...(ptrValue ? { ptr_search: ptrValue } : {}),
+    }, {
+        preserveState: true,
+        replace: true,
+    });
+};
+
+const handlePtrSearch = () => {
+    const risValue = risSearch.value.trim();
+    const ptrValue = ptrSearch.value.trim();
+    router.get('/requests/ris', {
+        ...(risValue ? { ris_search: risValue } : {}),
+        ...(ptrValue ? { ptr_search: ptrValue } : {}),
+    }, {
+        preserveState: true,
+        replace: true,
     });
 };
 
