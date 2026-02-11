@@ -125,7 +125,7 @@ class DashboardController extends Controller
         foreach ($lowStockItems as $item) {
             $notifications->push([
                 'type' => 'low_stock',
-                'message' => 'Low stock: ' . $item['itemname'],
+                'message' => 'Low stock: ' . strtoupper($item['itemname']),
             ]);
         }
 
@@ -133,7 +133,7 @@ class DashboardController extends Controller
         foreach ($expiringItems as $item) {
             $notifications->push([
                 'type' => 'expiring',
-                'message' => 'Medicine expiring: ' . $item['itemname'],
+                'message' => 'Medicine expiring: ' . strtoupper($item['itemname']),
             ]);
         }
 
@@ -178,7 +178,7 @@ class DashboardController extends Controller
             ],
             'inventoryStatus' => $inventoryStatus,
             'recentRequests' => $recentRequests,
-            'notifications' => $notifications->take(6)->values(),
+            'dashboardNotifications' => $notifications->take(6)->values(),
         ]);
     }
 }

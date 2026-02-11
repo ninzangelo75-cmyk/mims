@@ -271,7 +271,7 @@
                             </thead>
                             <tbody class="divide-y divide-gray-200 bg-white">
                                 <tr v-for="item in viewRecord.items" :key="item.recid">
-                                    <td class="px-3 py-2">{{ item.itemname }}</td>
+                                    <td class="px-3 py-2 uppercase">{{ item.itemname }}</td>
                                     <td class="px-3 py-2">{{ formatNumber(item.qty) }}</td>
                                     <td class="px-3 py-2">{{ item.uom }}</td>
                                     <td class="px-3 py-2">{{ formatMoney(item.unitprice) }}</td>
@@ -323,7 +323,7 @@
                             </thead>
                             <tbody class="divide-y divide-gray-200 bg-white">
                                 <tr v-for="item in editBatchRecord.items" :key="item.recid">
-                                    <td class="px-3 py-2">{{ item.itemname }}</td>
+                                    <td class="px-3 py-2 uppercase">{{ item.itemname }}</td>
                                     <td class="px-3 py-2">{{ item.qty }}</td>
                                     <td class="px-3 py-2">{{ item.uom }}</td>
                                     <td class="px-3 py-2">{{ formatMoney(item.unitprice) }}</td>

@@ -98,7 +98,7 @@
                                     <td class="whitespace-nowrap px-6 py-4 text-sm font-semibold text-gray-900">
                                         {{ formatReqId(request.req_ris) }}
                                     </td>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
+                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900 uppercase">
                                         {{ request.itemname }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
@@ -246,7 +246,7 @@
                                     <td class="whitespace-nowrap px-6 py-4 text-sm font-semibold text-gray-900">
                                         {{ formatPtrId(request.req_ptr) }}
                                     </td>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
+                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900 uppercase">
                                         {{ request.itemname }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">

@@ -71,7 +71,7 @@
                                         {{ formatItemCode(medicine.itemcode) }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-2">
-                                        <div class="text-sm font-semibold text-gray-900 truncate max-w-[180px] uppercase">{{ medicine.itemname }}</div>
+                                        <div class="text-sm text-gray-900 truncate max-w-[180px] uppercase">{{ medicine.itemname }}</div>
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-2">
                                         <span
@@ -281,26 +281,59 @@
                         variant="danger"
                         type="button"
                         class="bg-white text-blue-600 hover:bg-blue-50 focus:ring-white h-9"
-                        @click="closeItemModal"
+                        @click="requestItemCancel"
                     >
                         Cancel
                     </Button>
                     <Button
                         variant="secondary"
-                        type="submit"
+                        type="button"
                         class="bg-white text-blue-600 hover:bg-blue-50 focus:ring-white h-9"
                         :disabled="itemForm.processing"
+                        @click="requestSubmit"
                     >
                         {{ isEditMode ? 'Update Medicine' : 'Create Medicine' }}
                     </Button>
                 </div>
             </form>
         </Modal>
+
+        <Modal :show="showItemCancelConfirm" :showFooter="false" @close="closeItemCancelConfirm">
+            <div class="-mx-6 -mt-6 mb-6 rounded-t-lg bg-red-600 px-6 py-4 text-white">
+                <h3 class="text-lg font-semibold">Discard Changes?</h3>
+                <p class="text-sm text-white/80">You have entered information for this medicine.</p>
+            </div>
+            <p class="text-sm text-gray-700">Canceling will discard your input. Continue?</p>
+            <div class="-mx-6 -mb-6 mt-5 rounded-b-lg bg-red-600 px-6 py-4 flex items-center justify-end space-x-2 min-h-[56px]">
+                <Button variant="secondary" class="bg-white text-red-600 hover:bg-red-50 focus:ring-white h-9" @click="closeItemCancelConfirm">
+                    Keep Editing
+                </Button>
+                <Button variant="danger" class="bg-white text-red-600 hover:bg-red-50 focus:ring-white h-9" @click="confirmItemCancel">
+                    Discard
+                </Button>
+            </div>
+        </Modal>
+
+        <Modal :show="showItemSubmitConfirm" :showFooter="false" @close="closeItemSubmitConfirm">
+            <div class="-mx-6 -mt-6 mb-6 rounded-t-lg bg-[#2e7d32] px-6 py-4 text-white">
+                <h3 class="text-lg font-semibold">Create Medicine?</h3>
+                <p class="text-sm text-white/80">Please confirm before saving.</p>
+            </div>
+            <p class="text-sm text-gray-700">Add this medicine to the list?</p>
+            <div class="-mx-6 -mb-6 mt-5 rounded-b-lg bg-[#2e7d32] px-6 py-4 flex items-center justify-end space-x-2 min-h-[56px]">
+                <Button variant="secondary" class="bg-white text-[#2e7d32] hover:bg-[#dff1e1] focus:ring-white h-9" @click="closeItemSubmitConfirm">
+                    Cancel
+                </Button>
+                <Button variant="secondary" class="bg-white text-[#2e7d32] hover:bg-[#dff1e1] focus:ring-white h-9" @click="confirmSubmit">
+                    Confirm
+                </Button>
+            </div>
+        </Modal>
     </AppLayout>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Modal from '@/Components/Modal.vue';
@@ -331,6 +364,8 @@ const viewItem = ref<Item | null>(null);
 const showItemModal = ref(false);
 const isEditMode = ref(false);
 const editingItem = ref<Item | null>(null);
+const showItemCancelConfirm = ref(false);
+const showItemSubmitConfirm = ref(false);
 
 const itemForm = useForm({
     itemname: '',
@@ -388,6 +423,51 @@ const closeItemModal = () => {
     showItemModal.value = false;
 };
 
+const hasItemFormData = computed(() => {
+    return !!(
+        itemForm.itemname ||
+        itemForm.description ||
+        itemForm.brand ||
+        itemForm.dosage_form ||
+        itemForm.strength ||
+        itemForm.default_uom
+    );
+});
+
+const requestItemCancel = () => {
+    if (!isEditMode.value && hasItemFormData.value) {
+        showItemCancelConfirm.value = true;
+        return;
+    }
+    closeItemModal();
+};
+
+const closeItemCancelConfirm = () => {
+    showItemCancelConfirm.value = false;
+};
+
+const confirmItemCancel = () => {
+    showItemCancelConfirm.value = false;
+    closeItemModal();
+};
+
+const requestSubmit = () => {
+    if (!isEditMode.value && hasItemFormData.value) {
+        showItemSubmitConfirm.value = true;
+        return;
+    }
+    submitItem();
+};
+
+const closeItemSubmitConfirm = () => {
+    showItemSubmitConfirm.value = false;
+};
+
+const confirmSubmit = () => {
+    showItemSubmitConfirm.value = false;
+    submitItem();
+};
+
 const submitItem = () => {
     if (isEditMode.value && editingItem.value) {
         itemForm.put(`/items/${editingItem.value.itemcode}`, {
@@ -420,5 +500,3 @@ const formatItemCode = (code: number) => {
     return `MED-${String(code).padStart(6, '0')}`;
 };
 </script>
-
-

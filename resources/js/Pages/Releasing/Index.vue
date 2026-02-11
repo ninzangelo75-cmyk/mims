@@ -30,6 +30,9 @@
                             :data="risRequests"
                             :actions="risActions"
                         >
+                            <template #cell-itemname="{ value }">
+                                <span class="uppercase">{{ value }}</span>
+                            </template>
                             <template #cell-request_no="{ value }">
                                 <span class="font-medium">{{ value }}</span>
                             </template>
@@ -98,6 +101,9 @@
                             :data="ptrRequests"
                             :actions="ptrActions"
                         >
+                            <template #cell-itemname="{ value }">
+                                <span class="uppercase">{{ value }}</span>
+                            </template>
                             <template #cell-request_no="{ value }">
                                 <span class="font-medium">{{ value }}</span>
                             </template>

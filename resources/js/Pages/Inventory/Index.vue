@@ -76,7 +76,7 @@
                                     </td>
                                 </tr>
                                 <tr v-for="item in inventory" :key="item.itemcode" class="hover:bg-[#e8f5e9]">
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
+                                    <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 uppercase">
                                         {{ item.itemname }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">

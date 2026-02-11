@@ -52,14 +52,70 @@
                     </div>
 
                     <div class="flex items-center space-x-4">
-                        <button
-                            type="button"
-                            class="relative p-2 text-[#1b5e20] hover:bg-white/60 rounded-lg transition-colors"
-                            title="Notifications"
-                        >
-                            <Icon name="bell" className="w-5 h-5" />
-                            <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                        </button>
+                        <div class="relative">
+                            <button
+                                type="button"
+                                class="relative p-2 text-[#1b5e20] hover:bg-white/60 rounded-lg transition-colors"
+                                title="Notifications"
+                                @click="toggleNotifications"
+                            >
+                                <Icon name="bell" className="w-5 h-5" />
+                                <span
+                                    v-if="notificationCount > 0"
+                                    class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] leading-[18px] rounded-full text-center"
+                                >
+                                    {{ notificationCount }}
+                                </span>
+                            </button>
+
+                            <div
+                                v-if="showNotifications"
+                                class="absolute right-0 mt-2 w-80 rounded-xl border border-[#cfe8d1] bg-white shadow-lg z-50"
+                            >
+                                <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                                    <p class="text-sm font-semibold text-gray-900">Notifications</p>
+                                    <button
+                                        type="button"
+                                        class="text-gray-500 hover:text-gray-700"
+                                        @click="showNotifications = false"
+                                        aria-label="Close notifications"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="max-h-56 overflow-y-auto">
+                                    <div v-if="notifications.length === 0" class="px-4 py-6 text-sm text-gray-500">
+                                        No notifications yet.
+                                    </div>
+                                    <button
+                                        v-for="(note, index) in notifications"
+                                        :key="index"
+                                        type="button"
+                                        class="w-full text-left px-4 py-3 border-b border-gray-100 text-sm text-gray-700 hover:bg-[#f6fbf6]"
+                                        @click="handleNotificationClick(note)"
+                                    >
+                                        <div class="flex items-start gap-3">
+                                            <span :class="notificationDot(note.type)" class="mt-1 w-2 h-2 rounded-full"></span>
+                                            <div class="flex-1">
+                                                <p class="font-medium text-gray-900">{{ note.message }}</p>
+                                                <p v-if="note.time" class="text-xs text-gray-500 mt-1">{{ formatTime(note.time) }}</p>
+                                            </div>
+                                        </div>
+                                    </button>
+                                </div>
+                                <div class="px-4 py-3 border-t border-gray-100">
+                                    <button
+                                        type="button"
+                                        class="w-full text-center text-sm font-semibold text-[#1b5e20] hover:text-[#2e7d32]"
+                                        @click="openAllNotifications"
+                                    >
+                                        View All Notifications
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="flex items-center space-x-3 pl-4 border-l border-[#cfe8d1]">
                             <div class="text-right">
@@ -101,14 +157,51 @@
                 </div>
             </main>
         </div>
+
+        <Modal :show="showAllNotifications" :showFooter="false" maxWidth="sm:max-w-3xl" @close="showAllNotifications = false">
+            <div class="-mx-6 -mt-6 mb-6 rounded-t-lg bg-[#2e7d32] px-6 py-4 text-white">
+                <h3 class="text-lg font-semibold">All Notifications</h3>
+                <p class="text-sm text-white/80">Complete notification list</p>
+            </div>
+            <div class="max-h-[70vh] overflow-y-auto">
+                <div v-if="notifications.length === 0" class="px-6 py-8 text-sm text-gray-500">
+                    No notifications yet.
+                </div>
+                <button
+                    v-for="(note, index) in notifications"
+                    :key="index"
+                    type="button"
+                    class="w-full text-left px-6 py-4 border-b border-gray-100 text-sm text-gray-700 hover:bg-[#f6fbf6]"
+                    @click="handleNotificationClick(note)"
+                >
+                    <div class="flex items-start gap-3">
+                        <span :class="notificationDot(note.type)" class="mt-1 w-2 h-2 rounded-full"></span>
+                        <div class="flex-1">
+                            <p class="font-medium text-gray-900">{{ note.message }}</p>
+                            <p v-if="note.time" class="text-xs text-gray-500 mt-1">{{ formatTime(note.time) }}</p>
+                        </div>
+                    </div>
+                </button>
+            </div>
+            <div class="-mx-6 -mb-6 mt-6 rounded-b-lg bg-[#2e7d32] px-6 py-4 flex items-center justify-end">
+                <button
+                    type="button"
+                    class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-medium text-[#1b5e20] shadow-sm hover:bg-[#e8f5e9]"
+                    @click="showAllNotifications = false"
+                >
+                    Close
+                </button>
+            </div>
+        </Modal>
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import FlashMessage from '@/Components/FlashMessage.vue';
 import Icon from '@/Components/Icon.vue';
+import Modal from '@/Components/Modal.vue';
 
 const page = usePage();
 const user = computed(() => page.props.auth.user as any);
@@ -170,29 +263,57 @@ const logout = () => {
     router.post('/logout');
 };
 
-const idleTimeoutMs = 30_000;
-let idleTimer: ReturnType<typeof setTimeout> | null = null;
-const activityEvents = ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart'];
+const showNotifications = ref(false);
+const showAllNotifications = ref(false);
+const notifications = computed(() => {
+    const list = (page.props.notifications as Array<{ type: string; message: string; time?: string | null; href?: string }> | undefined) || [];
+    return [...list].sort((a, b) => {
+        const at = a.time ? new Date(a.time).getTime() : 0;
+        const bt = b.time ? new Date(b.time).getTime() : 0;
+        return bt - at;
+    });
+});
+const notificationCount = computed(() => notifications.value.length);
 
-const resetIdleTimer = () => {
-    if (idleTimer) clearTimeout(idleTimer);
-    idleTimer = setTimeout(() => {
-        const url = (page.url || '/') as string;
-        if (!url.startsWith('/dashboard')) {
-            router.visit('/dashboard', { replace: true, preserveScroll: true });
-        }
-    }, idleTimeoutMs);
+const toggleNotifications = () => {
+    showNotifications.value = !showNotifications.value;
 };
 
-onMounted(() => {
-    activityEvents.forEach((event) => window.addEventListener(event, resetIdleTimer, { passive: true }));
-    resetIdleTimer();
-});
+const openAllNotifications = () => {
+    showNotifications.value = false;
+    showAllNotifications.value = true;
+};
 
-onBeforeUnmount(() => {
-    activityEvents.forEach((event) => window.removeEventListener(event, resetIdleTimer));
-    if (idleTimer) clearTimeout(idleTimer);
-});
+const resolveNotificationHref = (note: { href?: string; type?: string }) => {
+    if (note.href) return note.href;
+    const type = note.type || '';
+    if (type.includes('low_stock') || type.includes('expiring')) return '/inventory';
+    if (type.includes('new_ris')) return '/requests/ris';
+    if (type.includes('new_ptr')) return '/requests/ptr';
+    if (type.includes('pending')) return '/approvals';
+    return undefined;
+};
+
+const handleNotificationClick = (note: { href?: string; type?: string }) => {
+    const href = resolveNotificationHref(note);
+    if (href) {
+        showNotifications.value = false;
+        showAllNotifications.value = false;
+        router.visit(href);
+    }
+};
+
+const notificationDot = (type: string) => {
+    if (type.includes('low_stock')) return 'bg-red-500';
+    if (type.includes('expiring')) return 'bg-amber-500';
+    if (type.includes('pending')) return 'bg-indigo-500';
+    return 'bg-emerald-500';
+};
+
+const formatTime = (value: string) => {
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? value : date.toLocaleString();
+};
 
 const isActive = (item: MenuItem) => {
     const url = (page.url || '/') as string;

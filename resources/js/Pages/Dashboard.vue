@@ -56,7 +56,7 @@
                                             <td colspan="4" class="py-6 text-center text-sm text-gray-500">No inventory data found.</td>
                                         </tr>
                                         <tr v-for="item in inventoryStatus" :key="item.itemcode" class="border-t border-gray-100">
-                                            <td class="py-3">{{ item.itemname }}</td>
+                                            <td class="py-3 uppercase">{{ item.itemname }}</td>
                                             <td class="py-3">{{ formatNumber(item.remaining) }}</td>
                                             <td class="py-3">{{ formatDate(item.expiry_date) }}</td>
                                             <td class="py-3 align-middle">
@@ -109,10 +109,10 @@
                             <h3 class="font-semibold text-[#1b5e20]">Notifications</h3>
                         </div>
                         <div class="p-5 space-y-3 text-sm text-gray-700">
-                            <div v-if="!notifications.length" class="text-sm text-gray-500">
+                            <div v-if="!dashboardNotifications.length" class="text-sm text-gray-500">
                                 No notifications yet.
                             </div>
-                            <div v-for="(note, index) in notifications" :key="index" class="flex items-start gap-3">
+                            <div v-for="(note, index) in dashboardNotifications" :key="index" class="flex items-start gap-3">
                                 <span :class="notificationDot(note.type)" class="mt-1 w-2 h-2 rounded-full"></span>
                                 <p>{{ note.message }}</p>
                             </div>
@@ -161,11 +161,11 @@ type Props = {
     stats: Stats;
     inventoryStatus: InventoryStatusItem[];
     recentRequests: RecentRequest[];
-    notifications: NotificationItem[];
+    dashboardNotifications: NotificationItem[];
 };
 
 const props = defineProps<Props>();
-const { stats, inventoryStatus, recentRequests, notifications } = props;
+const { stats, inventoryStatus, recentRequests, dashboardNotifications } = props;
 
 const formatNumber = (value: number) => {
     return value?.toLocaleString() ?? '0';
@@ -191,6 +191,3 @@ const notificationDot = (type: string) => {
     return 'bg-emerald-500';
 };
 </script>
-
-
-
